@@ -226,6 +226,44 @@ public class CheckoutPage extends BasePage {
         }
     }
 
+    public void submitExpectingValidationError() {
+
+        WebElement button =
+                waitForClickable(continueButton);
+
+        button.click();
+
+        try {
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(3)
+            ).until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            errorMessage
+                    )
+            );
+
+        } catch (TimeoutException exception) {
+
+            JavascriptExecutor js =
+                    (JavascriptExecutor) driver;
+
+            button =
+                    waitForClickable(continueButton);
+
+            js.executeScript(
+                    "arguments[0].closest('form').requestSubmit();",
+                    button
+            );
+
+            wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            errorMessage
+                    )
+            );
+        }
+    }
+
     public String getErrorMessage() {
         return getText(errorMessage);
     }
