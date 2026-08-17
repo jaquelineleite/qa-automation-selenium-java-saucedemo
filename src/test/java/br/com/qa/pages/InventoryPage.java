@@ -85,15 +85,47 @@ public class InventoryPage extends BasePage {
     }
 
     public InventoryPage removeBackpackFromCart() {
-        click(backpackRemoveButton);
 
-        wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        backpackAddButton
-                )
-        );
+        WebElement removeButton =
+                waitForClickable(backpackRemoveButton);
+
+        removeButton.click();
+
+        try {
+            new WebDriverWait(
+                    driver,
+                    Duration.ofSeconds(3)
+            ).until(currentDriver ->
+                    currentDriver
+                            .findElements(shoppingCartBadge)
+                            .isEmpty()
+            );
+
+        } catch (TimeoutException exception) {
+
+            removeButton =
+                    waitForClickable(backpackRemoveButton);
+
+            JavascriptExecutor js =
+                    (JavascriptExecutor) driver;
+
+            js.executeScript(
+                    "arguments[0].click();",
+                    removeButton
+            );
+
+            wait.until(currentDriver ->
+                    currentDriver
+                            .findElements(shoppingCartBadge)
+                            .isEmpty()
+            );
+        }
 
         return this;
+    }
+
+    public boolean isCartBadgeDisplayed() {
+        return !driver.findElements(shoppingCartBadge).isEmpty();
     }
 
     public String getCartItemCount() {
