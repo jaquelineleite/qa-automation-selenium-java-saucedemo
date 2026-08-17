@@ -32,6 +32,9 @@ public final class DriverFactory {
 
         ChromeOptions options = new ChromeOptions();
 
+        // Mantém o navegador alinhado à versão de CDP suportada pelo Selenium.
+        options.setBrowserVersion("151");
+
         if (headless) {
             options.addArguments("--headless=new");
         }

@@ -20,7 +20,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <selenium.version>4.46.0</selenium.version>
+        <selenium.version>4.47.0</selenium.version>
         <junit.version>5.12.2</junit.version>
         <allure.version>2.35.3</allure.version>
     </properties>
