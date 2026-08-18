@@ -71,6 +71,36 @@ Tecnologias:
 
 Os testes são executados em modo headless, permitindo futura integração com pipelines de CI/CD.
 
+### Massa de Dados / Dados Fictícios
+
+Para execução dos testes serão utilizados dados controlados e fictícios, adequados aos cenários propostos.
+
+#### Autenticação
+
+| Cenário | Usuário | Senha |
+|---|---|---|
+| Usuário válido | standard_user | secret_sauce |
+| Usuário bloqueado | locked_out_user | secret_sauce |
+| Credenciais inválidas | usuario_invalido | senha_invalida |
+| Usuário não informado | vazio | secret_sauce |
+| Senha não informada | standard_user | vazio |
+
+#### Checkout
+
+| Campo | Dado fictício |
+|---|---|
+| Nome | Jaqueline |
+| Sobrenome | QA |
+| CEP | 18150-000 |
+
+#### Produto
+
+Produto utilizado como referência nos testes:
+
+`Sauce Labs Backpack`
+
+Os dados podem ser alterados ou ampliados de acordo com a necessidade dos cenários, mantendo independência entre os testes e evitando dependência de dados produzidos por execuções anteriores.
+
 ---
 
 ## 5. Estratégia de Testes

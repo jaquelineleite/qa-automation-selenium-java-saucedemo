@@ -85,63 +85,84 @@ Esses cenários devem ser executados antes de qualquer decisão de liberação.
 
 ---
 
-## 5. Distribuição das 34 Horas
 
-A distribuição proposta é:
 
-### Testes funcionais — 12 horas
+## 5. Distribuição e Organização das 34 Horas
 
-Execução dos casos relacionados às alterações e aos fluxos críticos.
+Considerando a criticidade do projeto e o histórico de rollback, a estratégia principal será utilizar execução paralela para preservar a maior cobertura possível.
 
-Os 20 casos inicialmente previstos serão priorizados por risco.
+A redução de 48 para 34 horas não deve resultar automaticamente na eliminação da regressão completa.
 
-Os casos de menor criticidade poderão ser postergados quando necessário.
+### QA 1 — Testes Funcionais e Exploratórios
 
-### Testes exploratórios — 6 horas
+Responsável pela execução dos 20 casos funcionais e dos testes exploratórios planejados.
 
-Os testes exploratórios serão direcionados principalmente para:
+Estimativa:
 
-- áreas alteradas;
-- integrações;
-- cenários de maior risco;
-- comportamentos não cobertos pelos casos formais.
+- testes funcionais: 16 horas;
+- testes exploratórios: 12 horas;
+- total: 28 horas.
 
-A sessão exploratória será focada e baseada em charter.
+### QA 2 — Regressão Completa
 
-### Regressão — 16 horas
+Responsável pela execução da regressão completa do sistema, iniciando pelos fluxos de maior criticidade.
 
-A regressão será priorizada para:
+Estimativa:
 
-- funcionalidades críticas;
-- áreas impactadas pela alteração;
-- fluxos com histórico de defeitos;
-- integrações;
-- jornadas principais.
+- regressão completa: 20 horas.
 
-Sempre que possível, testes automatizados devem executar em paralelo às validações manuais.
+### Execução em Paralelo
 
-Total:
+As duas frentes serão iniciadas simultaneamente.
 
-34 horas.
+- QA 1 conclui sua frente em aproximadamente 28 horas;
+- QA 2 conclui a regressão em aproximadamente 20 horas;
+- o maior caminho permanece em 28 horas, dentro da janela disponível de 34 horas.
+
+As aproximadamente 6 horas restantes serão utilizadas para retestes, investigação de defeitos, validação de correções, contingências, consolidação dos resultados e decisão de Go/No-Go.
+
+Essa abordagem permite preservar os testes funcionais, os testes exploratórios e a regressão completa, reduzindo o risco diante do histórico de rollback.
+
+### Plano de Contingência
+
+Caso apenas um QA esteja disponível, a execução será priorizada por risco na seguinte ordem:
+
+1. smoke test;
+2. funcionalidades alteradas na sprint;
+3. fluxos críticos de negócio;
+4. regressão das áreas impactadas;
+5. defeitos reincidentes;
+6. cenários negativos de maior impacto;
+7. testes exploratórios direcionados.
+
+Qualquer cenário não executado deverá ser registrado como risco residual e comunicado antes da decisão de liberação.
 
 ---
 
 ## 6. Paralelização
 
-Para reduzir o tempo total sem comprometer excessivamente a cobertura, as atividades podem ser realizadas em paralelo.
+A paralelização será utilizada para preservar a cobertura planejada dentro da janela disponível de 34 horas.
 
-Exemplo:
+A divisão principal será:
 
 ### QA 1
 
-- testes funcionais das alterações;
-- retestes;
-- validação dos critérios de aceite.
+Responsável por:
+
+- 20 casos de testes funcionais;
+- fluxos principal, alternativos e de exceção;
+- testes exploratórios;
+- registro de evidências;
+- retestes quando necessário.
 
 ### QA 2
 
-- regressão crítica;
-- execução e acompanhamento da automação.
+Responsável por:
+
+- regressão completa do sistema;
+- priorização inicial dos fluxos críticos;
+- acompanhamento da automação;
+- registro de falhas e evidências.
 
 ### Desenvolvedor
 
@@ -151,17 +172,18 @@ Pode apoiar com:
 - investigação técnica;
 - correção de defeitos;
 - testes unitários;
-- validações técnicas.
+- análise de causa raiz.
 
-### Product Owner ou representante de negócio
+### Product Owner ou Representante de Negócio
 
 Pode apoiar na validação de:
 
 - regras críticas;
-- cenários de alto impacto;
-- comportamento esperado do produto.
+- critérios de aceite;
+- cenários de alto impacto para o negócio;
+- riscos que influenciem a decisão de Go/No-Go.
 
-A responsabilidade pela qualidade deve ser compartilhada pelo time.
+A responsabilidade pela qualidade permanece compartilhada pelo time, enquanto a coordenação e definição da estratégia de testes ficam sob responsabilidade do QA responsável pela entrega.
 
 ---
 

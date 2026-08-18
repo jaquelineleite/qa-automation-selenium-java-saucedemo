@@ -63,6 +63,14 @@ Da mesma forma, um defeito de baixa severidade pode receber alta prioridade caso
 
 ---
 
+## Observação sobre os incidentes simulados
+
+Os incidentes apresentados a seguir são cenários fictícios criados exclusivamente para demonstrar o processo de registro, classificação, análise de severidade e gerenciamento de defeitos.
+
+Eles não representam necessariamente defeitos reais encontrados durante a execução da automação na aplicação utilizada como referência.
+
+---
+
 # 4. Incidentes classificados por tipo
 
 ## BUG-001 — Erro de Implementação
