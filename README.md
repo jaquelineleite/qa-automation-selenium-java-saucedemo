@@ -1,5 +1,8 @@
 # QA Automation - Selenium Java - SauceDemo
 
+[![Automated Tests](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml)
+
+
 Projeto de automação de testes Web desenvolvido com **Java, Selenium WebDriver, JUnit 5 e Maven**, utilizando o padrão **Page Object**.
 
 A suíte automatiza fluxos críticos de uma aplicação de e-commerce, contemplando cenários principais, alternativos e de exceção.
@@ -246,15 +249,29 @@ Além da automação, o projeto possui documentação relacionada à estratégia
 
 ---
 
+## Integração Contínua
+
+O projeto possui pipeline configurado com **GitHub Actions**, executado automaticamente em `push` e `pull_request` para a branch `main`.
+
+O workflow realiza:
+
+- checkout do repositório;
+- configuração do Java 17;
+- execução da suíte com `mvn clean verify`;
+- geração e armazenamento do relatório de testes como artifact `test-report`;
+- armazenamento de screenshots quando houver falhas.
+
+O status da execução pode ser acompanhado pelo badge disponível no início deste README.
+
+---
+
 ## Próximas Evoluções
 
-- execução em pipeline CI/CD;
-- execução paralela;
-- múltiplos navegadores;
-- testes de API;
-- testes de performance;
-- publicação automática de relatórios;
-- matriz de browsers.
+- execução paralela dos testes;
+- execução em matriz de navegadores;
+- ampliação da cobertura com testes de API;
+- inclusão de testes de performance;
+- publicação navegável do relatório de testes.
 
 ---
 
