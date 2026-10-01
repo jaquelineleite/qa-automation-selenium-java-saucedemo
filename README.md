@@ -14,13 +14,16 @@ Atualmente o projeto possui **12 testes automatizados**, execução headless, ca
 ## Tecnologias
 
 - Java 17
-- Selenium WebDriver 4
+- Selenium WebDriver 4.50.0
 - JUnit 5
 - Maven
 - Google Chrome
+- Selenium Manager
 - Page Object Pattern
+- ThreadLocal WebDriver
 - Maven Surefire
 - Git e GitHub
+- GitHub Actions
 
 ---
 
@@ -124,6 +127,23 @@ src/test/java/br/com/qa/
 O projeto utiliza Page Object para separar elementos da interface, ações realizadas nas páginas e cenários de teste.
 
 Essa abordagem reduz duplicação de código e facilita manutenção e evolução da automação.
+
+---
+
+## Arquitetura da Automação
+
+O framework separa as responsabilidades de configuração do navegador, ciclo de vida dos testes, comportamentos reutilizáveis, páginas e cenários automatizados.
+
+```text
+Tests / Assertions
+        ↓
+Page Objects
+        ↓
+BasePage
+        ↓
+Selenium WebDriver
+        ↓
+DriverFactory
 
 ---
 
@@ -267,11 +287,11 @@ O status da execução pode ser acompanhado pelo badge disponível no início de
 
 ## Próximas Evoluções
 
-- execução paralela dos testes;
 - execução em matriz de navegadores;
 - ampliação da cobertura com testes de API;
 - inclusão de testes de performance;
-- publicação navegável do relatório de testes.
+- publicação navegável do relatório de testes;
+- evolução da estratégia de dados para cenários com maior concorrência.
 
 ---
 
