@@ -1,12 +1,8 @@
 package br.com.qa.pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -32,11 +28,9 @@ public class InventoryPage extends BasePage {
     }
 
     public boolean isLoaded() {
-        try {
-            wait.until(
-                    ExpectedConditions.urlContains("inventory.html")
-            );
 
+        try {
+            waitForUrlContaining("inventory.html");
             return isDisplayed(pageTitle);
 
         } catch (Exception exception) {
@@ -46,38 +40,25 @@ public class InventoryPage extends BasePage {
 
     public InventoryPage addBackpackToCart() {
 
-        WebElement addButton =
-                waitForClickable(backpackAddButton);
+        click(backpackAddButton);
 
-        addButton.click();
+        boolean badgeDisplayed =
+                waitForCondition(
+                        ExpectedConditions
+                                .visibilityOfElementLocated(
+                                        shoppingCartBadge
+                                ),
+                        Duration.ofSeconds(3)
+                );
 
-        try {
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(3)
-            ).until(
-                    ExpectedConditions.visibilityOfElementLocated(
-                            shoppingCartBadge
-                    )
+        if (!badgeDisplayed) {
+
+            clickWithJavaScript(
+                    backpackAddButton
             );
 
-        } catch (TimeoutException exception) {
-
-            addButton =
-                    waitForClickable(backpackAddButton);
-
-            JavascriptExecutor js =
-                    (JavascriptExecutor) driver;
-
-            js.executeScript(
-                    "arguments[0].click();",
-                    addButton
-            );
-
-            wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(
-                            shoppingCartBadge
-                    )
+            waitForVisibility(
+                    shoppingCartBadge
             );
         }
 
@@ -86,38 +67,32 @@ public class InventoryPage extends BasePage {
 
     public InventoryPage removeBackpackFromCart() {
 
-        WebElement removeButton =
-                waitForClickable(backpackRemoveButton);
+        click(backpackRemoveButton);
 
-        removeButton.click();
+        boolean badgeRemoved =
+                waitForCondition(
+                        currentDriver ->
+                                currentDriver
+                                        .findElements(
+                                                shoppingCartBadge
+                                        )
+                                        .isEmpty(),
+                        Duration.ofSeconds(3)
+                );
 
-        try {
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(3)
-            ).until(currentDriver ->
-                    currentDriver
-                            .findElements(shoppingCartBadge)
-                            .isEmpty()
+        if (!badgeRemoved) {
+
+            clickWithJavaScript(
+                    backpackRemoveButton
             );
 
-        } catch (TimeoutException exception) {
-
-            removeButton =
-                    waitForClickable(backpackRemoveButton);
-
-            JavascriptExecutor js =
-                    (JavascriptExecutor) driver;
-
-            js.executeScript(
-                    "arguments[0].click();",
-                    removeButton
-            );
-
-            wait.until(currentDriver ->
-                    currentDriver
-                            .findElements(shoppingCartBadge)
-                            .isEmpty()
+            wait.until(
+                    currentDriver ->
+                            currentDriver
+                                    .findElements(
+                                            shoppingCartBadge
+                                    )
+                                    .isEmpty()
             );
         }
 
@@ -125,7 +100,9 @@ public class InventoryPage extends BasePage {
     }
 
     public boolean isCartBadgeDisplayed() {
-        return !driver.findElements(shoppingCartBadge).isEmpty();
+        return !driver
+                .findElements(shoppingCartBadge)
+                .isEmpty();
     }
 
     public String getCartItemCount() {
@@ -133,36 +110,9 @@ public class InventoryPage extends BasePage {
     }
 
     public void openCart() {
-
-        WebElement cartElement =
-                waitForClickable(shoppingCartLink);
-
-        cartElement.click();
-
-        try {
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(3)
-            ).until(
-                    ExpectedConditions.urlContains("cart.html")
-            );
-
-        } catch (TimeoutException exception) {
-
-            cartElement =
-                    waitForClickable(shoppingCartLink);
-
-            JavascriptExecutor js =
-                    (JavascriptExecutor) driver;
-
-            js.executeScript(
-                    "arguments[0].click();",
-                    cartElement
-            );
-
-            wait.until(
-                    ExpectedConditions.urlContains("cart.html")
-            );
-        }
+        clickAndWaitForUrl(
+                shoppingCartLink,
+                "cart.html"
+        );
     }
 }

@@ -1,14 +1,7 @@
 package br.com.qa.pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 public class CartPage extends BasePage {
 
@@ -35,14 +28,10 @@ public class CartPage extends BasePage {
     }
 
     public boolean isLoaded() {
+
         try {
-            wait.until(
-                    ExpectedConditions.urlContains("cart.html")
-            );
-
-            waitForVisibility(pageTitle);
-
-            return true;
+            waitForUrlContaining("cart.html");
+            return isDisplayed(pageTitle);
 
         } catch (Exception exception) {
             return false;
@@ -62,73 +51,16 @@ public class CartPage extends BasePage {
     }
 
     public void proceedToCheckout() {
-        var checkoutElement = waitForClickable(checkoutButton);
-
-        checkoutElement.click();
-
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(3))
-                    .until(
-                            ExpectedConditions.urlContains(
-                                    "checkout-step-one.html"
-                            )
-                    );
-
-        } catch (TimeoutException exception) {
-
-            checkoutElement = waitForClickable(checkoutButton);
-
-            JavascriptExecutor js =
-                    (JavascriptExecutor) driver;
-
-            js.executeScript(
-                    "arguments[0].click();",
-                    checkoutElement
-            );
-
-            wait.until(
-                    ExpectedConditions.urlContains(
-                            "checkout-step-one.html"
-                    )
-            );
-        }
+        clickAndWaitForUrl(
+                checkoutButton,
+                "checkout-step-one.html"
+        );
     }
 
     public void continueShopping() {
-
-        WebElement button =
-                waitForClickable(continueShoppingButton);
-
-        button.click();
-
-        try {
-            new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(3)
-            ).until(
-                    ExpectedConditions.urlContains(
-                            "inventory.html"
-                    )
-            );
-
-        } catch (TimeoutException exception) {
-
-            button =
-                    waitForClickable(continueShoppingButton);
-
-            JavascriptExecutor js =
-                    (JavascriptExecutor) driver;
-
-            js.executeScript(
-                    "arguments[0].click();",
-                    button
-            );
-
-            wait.until(
-                    ExpectedConditions.urlContains(
-                            "inventory.html"
-                    )
-            );
-        }
+        clickAndWaitForUrl(
+                continueShoppingButton,
+                "inventory.html"
+        );
     }
 }
