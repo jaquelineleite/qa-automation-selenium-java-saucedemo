@@ -18,7 +18,9 @@ public final class ScreenshotUtils {
             Path.of("screenshots");
 
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+            DateTimeFormatter.ofPattern(
+                    "yyyyMMdd-HHmmss-SSS"
+            );
 
     private ScreenshotUtils() {
         // Impede instanciação da classe utilitária.
@@ -34,23 +36,39 @@ public final class ScreenshotUtils {
         }
 
         try {
-            Files.createDirectories(SCREENSHOT_DIRECTORY);
+            Files.createDirectories(
+                    SCREENSHOT_DIRECTORY
+            );
 
             String sanitizedTestName =
-                    testName.replaceAll("[^a-zA-Z0-9-_]", "_");
+                    testName.replaceAll(
+                            "[^a-zA-Z0-9-_]",
+                            "_"
+                    );
+
+            long threadId =
+                    Thread.currentThread()
+                            .getId();
 
             String fileName =
                     sanitizedTestName
+                            + "-thread-"
+                            + threadId
                             + "-"
-                            + LocalDateTime.now().format(FORMATTER)
+                            + LocalDateTime.now()
+                                    .format(FORMATTER)
                             + ".png";
 
             Path destination =
-                    SCREENSHOT_DIRECTORY.resolve(fileName);
+                    SCREENSHOT_DIRECTORY.resolve(
+                            fileName
+                    );
 
             File source =
                     ((TakesScreenshot) driver)
-                            .getScreenshotAs(OutputType.FILE);
+                            .getScreenshotAs(
+                                    OutputType.FILE
+                            );
 
             Files.copy(
                     source.toPath(),
