@@ -5,6 +5,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import java.time.Duration;
 import java.util.Locale;
@@ -80,6 +82,11 @@ public final class DriverFactory {
                             headless
                     );
 
+            case "edge" ->
+                    createEdgeDriver(
+                            headless
+                    );
+
             default ->
                     throw new IllegalArgumentException(
                             "Navegador não suportado: "
@@ -131,6 +138,30 @@ public final class DriverFactory {
         );
 
         return new FirefoxDriver(
+                options
+        );
+    }
+
+    private static WebDriver createEdgeDriver(
+            boolean headless
+    ) {
+
+        EdgeOptions options =
+                new EdgeOptions();
+
+        if (headless) {
+            options.addArguments(
+                    "--headless=new"
+            );
+        }
+
+        options.addArguments(
+                "--window-size=1920,1080",
+                "--disable-dev-shm-usage",
+                "--no-sandbox"
+        );
+
+        return new EdgeDriver(
                 options
         );
     }
