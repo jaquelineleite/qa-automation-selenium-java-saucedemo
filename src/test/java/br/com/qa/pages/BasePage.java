@@ -63,6 +63,23 @@ public abstract class BasePage {
         }
     }
 
+    protected boolean isPageLoaded(
+            String expectedUrlFragment,
+            By identifyingElement
+    ) {
+
+        boolean expectedUrlLoaded =
+                waitForCondition(
+                        ExpectedConditions.urlContains(
+                                expectedUrlFragment
+                        ),
+                        DEFAULT_TIMEOUT
+                );
+
+        return expectedUrlLoaded
+                && isDisplayed(identifyingElement);
+    }
+
     protected void click(By locator) {
         waitForClickable(locator).click();
     }

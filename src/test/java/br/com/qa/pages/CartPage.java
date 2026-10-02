@@ -28,14 +28,10 @@ public class CartPage extends BasePage {
     }
 
     public boolean isLoaded() {
-
-        try {
-            waitForUrlContaining("cart.html");
-            return isDisplayed(pageTitle);
-
-        } catch (Exception exception) {
-            return false;
-        }
+        return isPageLoaded(
+                "cart.html",
+                pageTitle
+        );
     }
 
     public boolean hasItem() {
