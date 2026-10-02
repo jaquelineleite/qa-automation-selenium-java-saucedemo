@@ -41,6 +41,7 @@ public class CheckoutPage extends BasePage {
                 "checkout-step-one.html",
                 firstNameInput
         );
+    }
 
 
     private void fillField(
