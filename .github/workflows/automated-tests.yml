@@ -11,7 +11,16 @@ on:
 
 jobs:
   automated-tests:
+    name: Tests - ${{ matrix.browser }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chrome
+          - firefox
+          - edge
 
     steps:
       - name: Checkout repository
@@ -24,23 +33,23 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Execute automated tests
-        run: mvn clean verify
+      - name: Execute automated tests - ${{ matrix.browser }}
+        run: mvn clean verify -Dbrowser=${{ matrix.browser }}
 
-      - name: Upload test report
+      - name: Upload test report - ${{ matrix.browser }}
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-report
+          name: test-report-${{ matrix.browser }}
           path: |
             target/reports/surefire.html
             target/surefire-reports/
           if-no-files-found: warn
 
-      - name: Upload screenshots on failure
+      - name: Upload screenshots on failure - ${{ matrix.browser }}
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: failure-screenshots
+          name: failure-screenshots-${{ matrix.browser }}
           path: screenshots/
           if-no-files-found: ignore
