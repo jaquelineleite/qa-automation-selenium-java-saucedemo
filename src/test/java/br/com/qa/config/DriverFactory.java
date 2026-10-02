@@ -3,8 +3,11 @@ package br.com.qa.config;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
+import java.util.Locale;
 
 public final class DriverFactory {
 
@@ -61,16 +64,28 @@ public final class DriverFactory {
             boolean headless
     ) {
 
-        if (!browser.equalsIgnoreCase("chrome")) {
-            throw new IllegalArgumentException(
-                    "Navegador não suportado: "
-                            + browser
-            );
-        }
+        String normalizedBrowser =
+                browser.toLowerCase(
+                        Locale.ROOT
+                );
 
-        return createChromeDriver(
-                headless
-        );
+        return switch (normalizedBrowser) {
+            case "chrome" ->
+                    createChromeDriver(
+                            headless
+                    );
+
+            case "firefox" ->
+                    createFirefoxDriver(
+                            headless
+                    );
+
+            default ->
+                    throw new IllegalArgumentException(
+                            "Navegador não suportado: "
+                                    + browser
+                    );
+        };
     }
 
     private static WebDriver createChromeDriver(
@@ -92,13 +107,30 @@ public final class DriverFactory {
                 "--no-sandbox"
         );
 
-        /*
-         * Não fixa uma versão específica do Chrome.
-         *
-         * O Selenium Manager pode resolver automaticamente
-         * navegador/driver compatíveis com o ambiente.
-         */
         return new ChromeDriver(
+                options
+        );
+    }
+
+    private static WebDriver createFirefoxDriver(
+            boolean headless
+    ) {
+
+        FirefoxOptions options =
+                new FirefoxOptions();
+
+        if (headless) {
+            options.addArguments(
+                    "-headless"
+            );
+        }
+
+        options.addArguments(
+                "--width=1920",
+                "--height=1080"
+        );
+
+        return new FirefoxDriver(
                 options
         );
     }
