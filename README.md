@@ -2,12 +2,11 @@
 
 [![Automated Tests](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml)
 
-
-Projeto de automação de testes Web desenvolvido com **Java, Selenium WebDriver, JUnit 5 e Maven**, utilizando o padrão **Page Object**.
+Projeto de automação de testes Web desenvolvido com **Java, Selenium WebDriver, JUnit 5 e Maven**, utilizando **Page Object Pattern** e práticas voltadas à manutenção, isolamento, investigação de falhas e execução contínua.
 
 A suíte automatiza fluxos críticos de uma aplicação de e-commerce, contemplando cenários principais, alternativos e de exceção.
 
-Atualmente o projeto possui **12 testes automatizados**, execução headless, captura automática de screenshots em falhas e geração de relatório HTML.
+Atualmente o projeto possui **12 testes automatizados**, execução headless, paralelismo controlado, captura automática de evidências em falhas, relatório HTML e pipeline de CI/CD.
 
 ---
 
@@ -74,7 +73,7 @@ BUILD SUCCESS
 
 ## Estratégia de Testes
 
-A automação contempla três grupos principais:
+A automação contempla três grupos principais.
 
 ### Fluxo principal
 
@@ -118,24 +117,19 @@ src/test/java/br/com/qa/
 └── utils/
     ├── ScreenshotUtils.java
     └── ScreenshotOnFailureExtension.java
+
+src/test/resources/
+└── junit-platform.properties
 ```
-
----
-
-## Page Object Pattern
-
-O projeto utiliza Page Object para separar elementos da interface, ações realizadas nas páginas e cenários de teste.
-
-Essa abordagem reduz duplicação de código e facilita manutenção e evolução da automação.
 
 ---
 
 ## Arquitetura da Automação
 
-O framework separa as responsabilidades de configuração do navegador, ciclo de vida dos testes, comportamentos reutilizáveis, páginas e cenários automatizados.
+O projeto separa responsabilidades para facilitar manutenção, evolução e investigação de falhas.
 
 ```text
-Tests / Assertions
+Testes / Assertions
         ↓
 Page Objects
         ↓
@@ -144,6 +138,67 @@ BasePage
 Selenium WebDriver
         ↓
 DriverFactory
+```
+
+### DriverFactory
+
+Centraliza a criação e o encerramento do WebDriver.
+
+A implementação utiliza `ThreadLocal<WebDriver>` para manter uma instância de navegador associada a cada thread de execução e remove essa referência durante o encerramento do driver.
+
+Atualmente, o navegador suportado pelo projeto é o **Google Chrome**.
+
+### BaseTest
+
+Centraliza o ciclo de vida dos testes, incluindo preparação da execução, acesso ao WebDriver e encerramento do navegador.
+
+### BasePage
+
+Concentra comportamentos reutilizáveis do Selenium, incluindo:
+
+- esperas explícitas;
+- espera por elementos visíveis e clicáveis;
+- espera por alteração de URL;
+- ações reutilizáveis de clique e preenchimento;
+- fallback de clique via JavaScript quando a navegação esperada não ocorre;
+- validação reutilizável de carregamento das páginas.
+
+Timeouts esperados durante verificações de estado são tratados de forma específica, evitando transformar indiscriminadamente erros técnicos inesperados em um simples resultado `false`.
+
+### Page Objects
+
+Encapsulam seletores e comportamentos específicos das páginas.
+
+As validações de carregamento reutilizam a estratégia centralizada da `BasePage`, reduzindo duplicação e mantendo um comportamento consistente entre as páginas.
+
+### Testes
+
+Os testes representam os cenários automatizados e mantêm as validações relacionadas ao comportamento esperado da aplicação.
+
+---
+
+## Execução Paralela Controlada
+
+O projeto utiliza paralelismo controlado através do JUnit 5.
+
+Configuração atual:
+
+```properties
+junit.jupiter.execution.parallel.enabled=true
+junit.jupiter.execution.parallel.mode.default=same_thread
+junit.jupiter.execution.parallel.mode.classes.default=concurrent
+junit.jupiter.execution.parallel.config.strategy=fixed
+junit.jupiter.execution.parallel.config.fixed.parallelism=2
+```
+
+Com essa estratégia:
+
+- classes de teste diferentes podem executar concorrentemente;
+- métodos pertencentes à mesma classe permanecem sequenciais;
+- o paralelismo é limitado a duas threads;
+- cada thread mantém sua própria referência de WebDriver através de `ThreadLocal`.
+
+Essa configuração foi adotada de forma controlada, preservando a previsibilidade da suíte e permitindo avaliar o comportamento da automação sob concorrência.
 
 ---
 
@@ -201,11 +256,21 @@ Os screenshots são armazenados em:
 screenshots/
 ```
 
+O nome da evidência contém informações que auxiliam na identificação da execução:
+
+```text
+teste-thread-id-timestamp.png
+```
+
+A identificação da thread e o timestamp com milissegundos ajudam a diferenciar evidências geradas em execuções concorrentes.
+
+A captura de evidência foi validada também através de falha controlada, verificando a geração do screenshot sem ocultar a falha original do teste.
+
 ---
 
 ## Execução Headless
 
-Por padrão, os testes são executados em modo headless, sendo adequado para GitHub Codespaces e pipelines CI/CD.
+Por padrão, os testes são executados em modo headless, adequado para GitHub Codespaces e pipelines CI/CD.
 
 ```bash
 mvn clean test
@@ -241,6 +306,8 @@ O navegador pode ser informado através de:
 -Dbrowser=chrome
 ```
 
+Atualmente a implementação oferece suporte ao Chrome.
+
 ---
 
 ## Documentação de QA
@@ -257,15 +324,22 @@ Além da automação, o projeto possui documentação relacionada à estratégia
 ## Boas Práticas Aplicadas
 
 - Page Object Pattern
-- Esperas explícitas
-- Ausência de `Thread.sleep()`
-- Testes independentes
-- Centralização de seletores
-- Execução headless
-- Screenshots automáticos em falhas
-- Relatório HTML
-- Priorização de cenários por risco
-- Evidências de execução
+- separação de responsabilidades
+- esperas explícitas
+- ausência de `Thread.sleep()`
+- centralização de comportamentos reutilizáveis
+- centralização do ciclo de vida do WebDriver
+- isolamento do WebDriver por thread
+- paralelismo controlado
+- testes independentes
+- validação centralizada de carregamento das páginas
+- tratamento específico de timeout nas verificações de estado
+- execução headless
+- screenshots automáticos em falhas
+- identificação das evidências por teste, thread e timestamp
+- relatório HTML
+- priorização de cenários por risco
+- CI/CD como mecanismo de feedback e Quality Gate
 
 ---
 
@@ -280,6 +354,8 @@ O workflow realiza:
 - execução da suíte com `mvn clean verify`;
 - geração e armazenamento do relatório de testes como artifact `test-report`;
 - armazenamento de screenshots quando houver falhas.
+
+Essa execução funciona como um **Quality Gate**, fornecendo feedback automatizado antes da integração das alterações à branch principal.
 
 O status da execução pode ser acompanhado pelo badge disponível no início deste README.
 
