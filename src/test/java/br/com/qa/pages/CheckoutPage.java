@@ -37,17 +37,11 @@ public class CheckoutPage extends BasePage {
     }
 
     public boolean isLoaded() {
-        try {
-            waitForUrlContaining(
-                    "checkout-step-one.html"
-            );
+        return isPageLoaded(
+                "checkout-step-one.html",
+                firstNameInput
+        );
 
-            return isDisplayed(firstNameInput);
-
-        } catch (Exception exception) {
-            return false;
-        }
-    }
 
     private void fillField(
             By locator,

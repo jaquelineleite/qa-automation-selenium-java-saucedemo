@@ -16,18 +16,10 @@ public class CheckoutOverviewPage extends BasePage {
     }
 
     public boolean isLoaded() {
-
-        try {
-            waitForUrlContaining(
-                    "checkout-step-two.html"
-            );
-
-            return isDisplayed(productName)
-                    && isDisplayed(finishButton);
-
-        } catch (Exception exception) {
-            return false;
-        }
+        return isPageLoaded(
+                "checkout-step-two.html",
+                productName
+        ) && isDisplayed(finishButton);
     }
 
     public String getProductName() {

@@ -28,14 +28,10 @@ public class InventoryPage extends BasePage {
     }
 
     public boolean isLoaded() {
-
-        try {
-            waitForUrlContaining("inventory.html");
-            return isDisplayed(pageTitle);
-
-        } catch (Exception exception) {
-            return false;
-        }
+        return isPageLoaded(
+                "inventory.html",
+                pageTitle
+        );
     }
 
     public InventoryPage addBackpackToCart() {
