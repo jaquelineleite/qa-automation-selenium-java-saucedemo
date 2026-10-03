@@ -1,5 +1,7 @@
 package br.com.qa.tests;
 
+import br.com.qa.data.TestData;
+
 import br.com.qa.pages.InventoryPage;
 import br.com.qa.pages.LoginPage;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +25,8 @@ class LoginTest extends BaseTest {
         InventoryPage inventoryPage = new InventoryPage(driver);
 
         loginPage.login(
-                "standard_user",
-                "secret_sauce"
+                TestData.STANDARD_USER.username(),
+                TestData.STANDARD_USER.password()
         );
 
         assertTrue(

@@ -1,5 +1,7 @@
 package br.com.qa.tests;
 
+import br.com.qa.data.TestData;
+
 import br.com.qa.pages.CartPage;
 import br.com.qa.pages.InventoryPage;
 import br.com.qa.pages.LoginPage;
@@ -22,8 +24,8 @@ class AlternativeFlowTest extends BaseTest {
         InventoryPage inventoryPage = new InventoryPage(driver);
 
         loginPage.login(
-                "standard_user",
-                "secret_sauce"
+                TestData.STANDARD_USER.username(),
+                TestData.STANDARD_USER.password()
         );
 
         assertTrue(inventoryPage.isLoaded());
@@ -51,8 +53,8 @@ class AlternativeFlowTest extends BaseTest {
         CartPage cartPage = new CartPage(driver);
 
         loginPage.login(
-                "standard_user",
-                "secret_sauce"
+                TestData.STANDARD_USER.username(),
+                TestData.STANDARD_USER.password()
         );
 
         assertTrue(inventoryPage.isLoaded());
