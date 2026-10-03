@@ -140,8 +140,8 @@ public abstract class BasePage {
     protected boolean isDisplayed(By locator) {
 
         try {
-            return waitForVisibility(locator)
-                    .isDisplayed();
+            waitForVisibility(locator);
+            return true;
 
         } catch (TimeoutException exception) {
             return false;
