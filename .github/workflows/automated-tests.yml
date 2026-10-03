@@ -33,6 +33,32 @@ jobs:
           java-version: '17'
           cache: maven
 
+      - name: Edge environment diagnostics
+        if: matrix.browser == 'edge'
+        run: |
+          echo "=== OS ==="
+          uname -a
+          cat /etc/os-release
+
+          echo "=== CPU ==="
+          nproc
+          lscpu
+
+          echo "=== MEMORY ==="
+          free -h
+
+          echo "=== SHARED MEMORY ==="
+          df -h /dev/shm
+
+          echo "=== JAVA ==="
+          java -version
+
+          echo "=== PREINSTALLED EDGE ==="
+          microsoft-edge --version || microsoft-edge-stable --version || echo "Edge not found in PATH"
+
+          echo "=== SELENIUM CACHE BEFORE TESTS ==="
+          find ~/.cache/selenium -maxdepth 5 -type f 2>/dev/null | sort || true
+
       - name: Execute automated tests - ${{ matrix.browser }}
         run: mvn clean verify -Dbrowser=${{ matrix.browser }}
 

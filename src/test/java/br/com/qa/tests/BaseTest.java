@@ -28,8 +28,6 @@ public abstract class BaseTest {
 
         driver = DriverFactory.getDriver();
 
-        driver.manage().deleteAllCookies();
-
         driver.get(BASE_URL);
     }
 
