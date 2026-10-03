@@ -1,5 +1,7 @@
 package br.com.qa.tests;
 
+import br.com.qa.data.TestData;
+
 import br.com.qa.pages.CartPage;
 import br.com.qa.pages.CheckoutPage;
 import br.com.qa.pages.InventoryPage;
@@ -25,8 +27,8 @@ class CheckoutValidationTest extends BaseTest {
         CartPage cartPage = new CartPage(driver);
 
         loginPage.login(
-                "standard_user",
-                "secret_sauce"
+                TestData.STANDARD_USER.username(),
+                TestData.STANDARD_USER.password()
         );
 
         assertTrue(inventoryPage.isLoaded());
@@ -47,8 +49,8 @@ class CheckoutValidationTest extends BaseTest {
     @DisplayName("Deve impedir checkout sem nome")
     void shouldRequireFirstName() {
 
-        checkoutPage.fillLastName("QA");
-        checkoutPage.fillPostalCode("18150-000");
+        checkoutPage.fillLastName(TestData.VALID_CHECKOUT.lastName());
+        checkoutPage.fillPostalCode(TestData.VALID_CHECKOUT.postalCode());
 
         checkoutPage.submitExpectingValidationError();
 
@@ -62,8 +64,8 @@ class CheckoutValidationTest extends BaseTest {
     @DisplayName("Deve impedir checkout sem sobrenome")
     void shouldRequireLastName() {
 
-        checkoutPage.fillFirstName("Jaqueline");
-        checkoutPage.fillPostalCode("18150-000");
+        checkoutPage.fillFirstName(TestData.VALID_CHECKOUT.firstName());
+        checkoutPage.fillPostalCode(TestData.VALID_CHECKOUT.postalCode());
 
         checkoutPage.submitExpectingValidationError();
 
@@ -77,8 +79,8 @@ class CheckoutValidationTest extends BaseTest {
     @DisplayName("Deve impedir checkout sem CEP")
     void shouldRequirePostalCode() {
 
-        checkoutPage.fillFirstName("Jaqueline");
-        checkoutPage.fillLastName("QA");
+        checkoutPage.fillFirstName(TestData.VALID_CHECKOUT.firstName());
+        checkoutPage.fillLastName(TestData.VALID_CHECKOUT.lastName());
 
         checkoutPage.submitExpectingValidationError();
 

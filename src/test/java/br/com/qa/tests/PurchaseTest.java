@@ -1,5 +1,7 @@
 package br.com.qa.tests;
 
+import br.com.qa.data.TestData;
+
 import br.com.qa.pages.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -26,8 +28,8 @@ class PurchaseTest extends BaseTest {
                 new CheckoutCompletePage(driver);
 
         loginPage.login(
-                "standard_user",
-                "secret_sauce"
+                TestData.STANDARD_USER.username(),
+                TestData.STANDARD_USER.password()
         );
 
         assertTrue(inventoryPage.isLoaded());
@@ -53,9 +55,9 @@ class PurchaseTest extends BaseTest {
         assertTrue(checkoutPage.isLoaded());
 
         checkoutPage.fillCustomerData(
-                "Jaqueline",
-                "QA",
-                "18150-000"
+                TestData.VALID_CHECKOUT.firstName(),
+                TestData.VALID_CHECKOUT.lastName(),
+                TestData.VALID_CHECKOUT.postalCode()
         );
 
         checkoutPage.continueCheckout();
