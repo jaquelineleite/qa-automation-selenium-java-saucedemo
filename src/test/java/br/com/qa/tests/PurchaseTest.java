@@ -2,14 +2,17 @@ package br.com.qa.tests;
 
 import br.com.qa.pages.*;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("regression")
 class PurchaseTest extends BaseTest {
 
     @Test
+    @Tag("smoke")
     @DisplayName("Deve realizar compra com sucesso")
     void shouldCompletePurchaseSuccessfully() {
 
