@@ -60,12 +60,7 @@ jobs:
           find ~/.cache/selenium -maxdepth 5 -type f 2>/dev/null | sort || true
 
       - name: Execute automated tests - ${{ matrix.browser }}
-        run: |
-          if [ "${{ matrix.browser }}" = "edge" ]; then
-            mvn clean verify -Dbrowser=edge -Djunit.jupiter.execution.parallel.config.fixed.parallelism=1
-          else
-            mvn clean verify -Dbrowser=${{ matrix.browser }}
-          fi
+        run: mvn clean verify -Dbrowser=${{ matrix.browser }}
 
       - name: Upload test report - ${{ matrix.browser }}
         if: always()
