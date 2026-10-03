@@ -8,16 +8,12 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 
-import java.time.Duration;
 import java.util.Locale;
 
 public final class DriverFactory {
 
     private static final ThreadLocal<WebDriver> DRIVER =
             new ThreadLocal<>();
-
-    private static final Duration PAGE_LOAD_TIMEOUT =
-            Duration.ofSeconds(30);
 
     private DriverFactory() {
         /*
@@ -33,18 +29,10 @@ public final class DriverFactory {
         }
 
         String browser =
-                System.getProperty(
-                        "browser",
-                        "chrome"
-                );
+                TestConfig.getBrowser();
 
         boolean headless =
-                Boolean.parseBoolean(
-                        System.getProperty(
-                                "headless",
-                                "true"
-                        )
-                );
+                TestConfig.isHeadless();
 
         WebDriver driver =
                 createDriver(
@@ -55,7 +43,7 @@ public final class DriverFactory {
         driver.manage()
                 .timeouts()
                 .pageLoadTimeout(
-                        PAGE_LOAD_TIMEOUT
+                        TestConfig.getPageLoadTimeout()
                 );
 
         DRIVER.set(driver);
