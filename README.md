@@ -6,7 +6,7 @@ Projeto de automação de testes Web desenvolvido com **Java, Selenium WebDriver
 
 A suíte automatiza fluxos críticos de uma aplicação de e-commerce, contemplando cenários principais, alternativos e de exceção.
 
-Atualmente o projeto possui **12 testes automatizados**, execução headless, paralelismo controlado, captura automática de evidências em falhas, relatório HTML e pipeline de CI/CD.
+Atualmente o projeto possui **12 testes automatizados**, execução cross-browser em **Google Chrome, Mozilla Firefox e Microsoft Edge**, modo headless, paralelismo controlado, captura automática de evidências em falhas, relatório HTML e pipeline de CI/CD.
 
 ---
 
@@ -17,6 +17,8 @@ Atualmente o projeto possui **12 testes automatizados**, execução headless, pa
 - JUnit 5
 - Maven
 - Google Chrome
+- Mozilla Firefox
+- Microsoft Edge
 - Selenium Manager
 - Page Object Pattern
 - ThreadLocal WebDriver
@@ -58,7 +60,15 @@ Atualmente o projeto possui **12 testes automatizados**, execução headless, pa
 
 ## Resultado Atual
 
-Última execução completa:
+A mesma suíte de **12 testes automatizados** é executada nos três navegadores suportados:
+
+- Google Chrome
+- Mozilla Firefox
+- Microsoft Edge
+
+A matriz cross-browser foi validada no pipeline de Pull Request e novamente na branch `main`, com os três jobs concluídos com sucesso.
+
+Resultado esperado por navegador:
 
 ```text
 Tests run: 12
@@ -146,7 +156,7 @@ Centraliza a criação e o encerramento do WebDriver.
 
 A implementação utiliza `ThreadLocal<WebDriver>` para manter uma instância de navegador associada a cada thread de execução e remove essa referência durante o encerramento do driver.
 
-Atualmente, o navegador suportado pelo projeto é o **Google Chrome**.
+A `DriverFactory` oferece suporte a **Google Chrome, Mozilla Firefox e Microsoft Edge**, mantendo centralizada a criação e o ciclo de vida dos diferentes WebDrivers.
 
 ### BaseTest
 
@@ -208,7 +218,7 @@ Essa configuração foi adotada de forma controlada, preservando a previsibilida
 
 - Java 17 ou superior
 - Maven
-- Google Chrome
+- Google Chrome, Mozilla Firefox ou Microsoft Edge para execução local no navegador correspondente
 
 Clone o projeto:
 
@@ -300,13 +310,15 @@ Exemplo:
 mvn clean test -DbaseUrl=https://www.saucedemo.com/
 ```
 
-O navegador pode ser informado através de:
+O navegador pode ser informado através da propriedade `browser`.
 
-```bash
+```text
 -Dbrowser=chrome
+-Dbrowser=firefox
+-Dbrowser=edge
 ```
 
-Atualmente a implementação oferece suporte ao Chrome.
+A implementação oferece suporte a **Chrome, Firefox e Edge**, utilizando a mesma suíte automatizada.
 
 ---
 
@@ -339,7 +351,7 @@ Além da automação, o projeto possui documentação relacionada à estratégia
 - identificação das evidências por teste, thread e timestamp
 - relatório HTML
 - priorização de cenários por risco
-- CI/CD como mecanismo de feedback e Quality Gate
+- CI/CD como mecanismo de feedback e validação automatizada
 
 ---
 
@@ -347,15 +359,19 @@ Além da automação, o projeto possui documentação relacionada à estratégia
 
 O projeto possui pipeline configurado com **GitHub Actions**, executado automaticamente em `push` e `pull_request` para a branch `main`.
 
-O workflow realiza:
+O workflow utiliza uma **matriz cross-browser** para executar a mesma suíte em **Google Chrome, Mozilla Firefox e Microsoft Edge**.
+
+Para cada navegador, o pipeline realiza:
 
 - checkout do repositório;
 - configuração do Java 17;
-- execução da suíte com `mvn clean verify`;
-- geração e armazenamento do relatório de testes como artifact `test-report`;
-- armazenamento de screenshots quando houver falhas.
+- execução da suíte com `mvn clean verify -Dbrowser=<browser>`;
+- geração e armazenamento do relatório de testes em artifact específico por navegador (`test-report-<browser>`);
+- armazenamento de screenshots em artifact específico por navegador (`failure-screenshots-<browser>`) quando houver falhas.
 
-Essa execução funciona como um **Quality Gate**, fornecendo feedback automatizado antes da integração das alterações à branch principal.
+A estratégia utiliza `fail-fast: false`, permitindo que os jobs dos demais navegadores continuem mesmo se um deles apresentar falha.
+
+Essa execução fornece validação automatizada cross-browser e feedback contínuo sobre as alterações enviadas ao repositório.
 
 O status da execução pode ser acompanhado pelo badge disponível no início deste README.
 
@@ -363,7 +379,6 @@ O status da execução pode ser acompanhado pelo badge disponível no início de
 
 ## Próximas Evoluções
 
-- execução em matriz de navegadores;
 - ampliação da cobertura com testes de API;
 - inclusão de testes de performance;
 - publicação navegável do relatório de testes;
