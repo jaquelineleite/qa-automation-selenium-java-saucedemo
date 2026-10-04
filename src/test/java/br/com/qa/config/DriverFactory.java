@@ -1,6 +1,8 @@
 package br.com.qa.config;
 
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -11,6 +13,9 @@ import org.openqa.selenium.edge.EdgeOptions;
 import java.util.Locale;
 
 public final class DriverFactory {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(DriverFactory.class);
 
     private static final ThreadLocal<WebDriver> DRIVER =
             new ThreadLocal<>();
@@ -47,6 +52,12 @@ public final class DriverFactory {
                 );
 
         DRIVER.set(driver);
+
+        LOGGER.info(
+                "DRIVER STARTED browser={} headless={}",
+                browser,
+                headless
+        );
     }
 
     private static WebDriver createDriver(
@@ -186,6 +197,10 @@ public final class DriverFactory {
              * evitando reutilização indevida do driver.
              */
             DRIVER.remove();
+
+            LOGGER.info(
+                    "DRIVER CLOSED"
+            );
         }
     }
 }

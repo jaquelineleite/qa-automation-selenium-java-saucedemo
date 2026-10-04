@@ -3,6 +3,8 @@ package br.com.qa.utils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public final class ScreenshotUtils {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ScreenshotUtils.class);
 
     private static final Path SCREENSHOT_DIRECTORY =
             Path.of("screenshots");
@@ -76,18 +81,19 @@ public final class ScreenshotUtils {
                     StandardCopyOption.REPLACE_EXISTING
             );
 
-            System.out.println(
-                    "[EVIDÊNCIA] Screenshot salvo em: "
-                            + destination
+            LOGGER.info(
+                    "SCREENSHOT CAPTURED path={}",
+                    destination
             );
 
             return destination;
 
         } catch (IOException exception) {
 
-            System.err.println(
-                    "[EVIDÊNCIA] Não foi possível gerar screenshot: "
-                            + exception.getMessage()
+            LOGGER.error(
+                    "SCREENSHOT FAILED error={}",
+                    exception.getMessage(),
+                    exception
             );
 
             return null;
