@@ -1,6 +1,8 @@
 package br.com.qa.utils;
 
 import br.com.qa.config.DriverFactory;
+import br.com.qa.failure.FailureClassification;
+import br.com.qa.failure.FailureClassifier;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.WebDriver;
@@ -26,9 +28,14 @@ public class ScreenshotOnFailureExtension
                         + "-"
                         + context.getRequiredTestMethod().getName();
 
+        FailureClassification classification =
+                FailureClassifier.classify(throwable);
+
         LOGGER.error(
-                "TEST FAILURE test={} error={}",
+                "TEST FAILURE test={} category={} reason={} error={}",
                 testName,
+                classification.category(),
+                classification.reason(),
                 throwable.getMessage()
         );
 
