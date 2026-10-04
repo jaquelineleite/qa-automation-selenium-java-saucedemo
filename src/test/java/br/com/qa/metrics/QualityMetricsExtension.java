@@ -1,5 +1,10 @@
 package br.com.qa.metrics;
 
+import br.com.qa.quality.QualityGateEvaluator;
+import br.com.qa.quality.QualityGatePolicy;
+import br.com.qa.quality.QualityGateResult;
+import br.com.qa.quality.QualityMetrics;
+
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestWatcher;
@@ -15,6 +20,7 @@ public class QualityMetricsExtension
     private static final Logger LOGGER =
             LoggerFactory.getLogger(QualityMetricsExtension.class);
 
+    private static final String PRODUCT_TEST_TAG = "regression";
     private static final String CRITICAL_TAG = "smoke";
 
     private static final ExtensionContext.Namespace NAMESPACE =
@@ -22,45 +28,20 @@ public class QualityMetricsExtension
                     QualityMetricsExtension.class
             );
 
-    private static final AtomicInteger TOTAL =
-            new AtomicInteger();
-
-    private static final AtomicInteger PASSED =
-            new AtomicInteger();
-
-    private static final AtomicInteger FAILED =
-            new AtomicInteger();
-
-    private static final AtomicInteger CRITICAL_TOTAL =
-            new AtomicInteger();
-
-    private static final AtomicInteger CRITICAL_PASSED =
-            new AtomicInteger();
-
-    private static final AtomicInteger CRITICAL_FAILED =
-            new AtomicInteger();
-
     @Override
     public void beforeAll(ExtensionContext context) {
-
-        ExtensionContext root = context.getRoot();
-
-        root.getStore(NAMESPACE).getOrComputeIfAbsent(
-                MetricsReport.class,
-                key -> new MetricsReport(),
-                MetricsReport.class
-        );
+        getMetricsReport(context);
     }
 
     @Override
     public void testSuccessful(ExtensionContext context) {
-        TOTAL.incrementAndGet();
-        PASSED.incrementAndGet();
-
-        if (isCritical(context)) {
-            CRITICAL_TOTAL.incrementAndGet();
-            CRITICAL_PASSED.incrementAndGet();
+        if (!isProductTest(context)) {
+            return;
         }
+
+        getMetricsReport(context).recordSuccess(
+                isCritical(context)
+        );
     }
 
     @Override
@@ -68,13 +49,29 @@ public class QualityMetricsExtension
             ExtensionContext context,
             Throwable cause
     ) {
-        TOTAL.incrementAndGet();
-        FAILED.incrementAndGet();
-
-        if (isCritical(context)) {
-            CRITICAL_TOTAL.incrementAndGet();
-            CRITICAL_FAILED.incrementAndGet();
+        if (!isProductTest(context)) {
+            return;
         }
+
+        getMetricsReport(context).recordFailure(
+                isCritical(context)
+        );
+    }
+
+    private MetricsReport getMetricsReport(
+            ExtensionContext context
+    ) {
+        return context.getRoot()
+                .getStore(NAMESPACE)
+                .getOrComputeIfAbsent(
+                        MetricsReport.class,
+                        key -> new MetricsReport(),
+                        MetricsReport.class
+                );
+    }
+
+    private boolean isProductTest(ExtensionContext context) {
+        return context.getTags().contains(PRODUCT_TEST_TAG);
     }
 
     private boolean isCritical(ExtensionContext context) {
@@ -84,27 +81,68 @@ public class QualityMetricsExtension
     private static final class MetricsReport
             implements ExtensionContext.Store.CloseableResource {
 
+        private final AtomicInteger total =
+                new AtomicInteger();
+
+        private final AtomicInteger passed =
+                new AtomicInteger();
+
+        private final AtomicInteger failed =
+                new AtomicInteger();
+
+        private final AtomicInteger criticalTotal =
+                new AtomicInteger();
+
+        private final AtomicInteger criticalPassed =
+                new AtomicInteger();
+
+        private final AtomicInteger criticalFailed =
+                new AtomicInteger();
+
         private final long startTime =
                 System.nanoTime();
+
+        private void recordSuccess(boolean critical) {
+            total.incrementAndGet();
+            passed.incrementAndGet();
+
+            if (critical) {
+                criticalTotal.incrementAndGet();
+                criticalPassed.incrementAndGet();
+            }
+        }
+
+        private void recordFailure(boolean critical) {
+            total.incrementAndGet();
+            failed.incrementAndGet();
+
+            if (critical) {
+                criticalTotal.incrementAndGet();
+                criticalFailed.incrementAndGet();
+            }
+        }
 
         @Override
         public void close() {
 
-            int total = TOTAL.get();
-            int passed = PASSED.get();
-            int failed = FAILED.get();
+            int totalValue = total.get();
+            int passedValue = passed.get();
+            int failedValue = failed.get();
 
-            int criticalTotal = CRITICAL_TOTAL.get();
-            int criticalPassed = CRITICAL_PASSED.get();
-            int criticalFailed = CRITICAL_FAILED.get();
+            int criticalTotalValue = criticalTotal.get();
+            int criticalPassedValue = criticalPassed.get();
+            int criticalFailedValue = criticalFailed.get();
 
             double passRate =
-                    calculateRate(passed, total);
+                    calculateRate(
+                            passedValue,
+                            totalValue
+                    );
 
             double criticalPassRate =
                     calculateRate(
-                            criticalPassed,
-                            criticalTotal
+                            criticalPassedValue,
+                            criticalTotalValue
                     );
 
             double durationSeconds =
@@ -115,16 +153,70 @@ public class QualityMetricsExtension
                     "QUALITY SUMMARY total={} passed={} failed={} passRate={} " +
                             "criticalTotal={} criticalPassed={} criticalFailed={} " +
                             "criticalPassRate={} durationSeconds={}",
-                    total,
-                    passed,
-                    failed,
+                    totalValue,
+                    passedValue,
+                    failedValue,
                     format(passRate),
-                    criticalTotal,
-                    criticalPassed,
-                    criticalFailed,
+                    criticalTotalValue,
+                    criticalPassedValue,
+                    criticalFailedValue,
                     format(criticalPassRate),
                     format(durationSeconds)
             );
+
+            if (totalValue > 0) {
+                evaluateQualityGate(
+                        totalValue,
+                        passedValue,
+                        failedValue,
+                        passRate,
+                        criticalTotalValue,
+                        criticalPassedValue,
+                        criticalFailedValue,
+                        criticalPassRate
+                );
+            }
+        }
+
+        private static void evaluateQualityGate(
+                int total,
+                int passed,
+                int failed,
+                double passRate,
+                int criticalTotal,
+                int criticalPassed,
+                int criticalFailed,
+                double criticalPassRate
+        ) {
+            QualityMetrics metrics = new QualityMetrics(
+                    total,
+                    passed,
+                    failed,
+                    passRate,
+                    criticalTotal,
+                    criticalPassed,
+                    criticalFailed,
+                    criticalPassRate
+            );
+
+            QualityGateEvaluator evaluator =
+                    new QualityGateEvaluator();
+
+            QualityGateResult result = evaluator.evaluate(
+                    metrics,
+                    QualityGatePolicy.defaultPolicy()
+            );
+
+            if (result.passed()) {
+                LOGGER.info(
+                        "QUALITY GATE status=PASSED"
+                );
+            } else {
+                LOGGER.warn(
+                        "QUALITY GATE status=FAILED reasons={}",
+                        result.reasons()
+                );
+            }
         }
 
         private static double calculateRate(
@@ -137,7 +229,11 @@ public class QualityMetricsExtension
         }
 
         private static String format(double value) {
-            return String.format(Locale.ROOT, "%.2f", value);
+            return String.format(
+                    Locale.ROOT,
+                    "%.2f",
+                    value
+            );
         }
     }
 }
