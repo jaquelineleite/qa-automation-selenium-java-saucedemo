@@ -221,7 +221,63 @@ Isso permite aumentar a cobertura dentro da janela disponível.
 
 ---
 
-## 9. Critérios de Go / No-Go
+## 9. Quality Gate e Governança da Decisão
+
+O Quality Gate automatizado funciona como um sinal técnico para apoiar a tomada de decisão.
+
+A política atual deste projeto considera:
+
+- taxa mínima de aprovação geral de 95%;
+- taxa de aprovação dos testes críticos de 100%;
+- nenhuma falha crítica permitida.
+
+Esses limites representam uma política definida para este projeto e não devem ser tratados como valores universais para qualquer produto ou contexto.
+
+### Quality Gate FAILED
+
+Um resultado `FAILED` indica que os critérios técnicos definidos pela política não foram atendidos.
+
+Esse resultado deve:
+
+- permanecer visível;
+- ser investigado;
+- ter suas evidências analisadas;
+- ser correlacionado com criticidade e risco;
+- contribuir para a recomendação de Go/No-Go.
+
+O resultado não determina, isoladamente, a causa da falha nem substitui a análise do contexto.
+
+Uma falha causada por comportamento do produto, teste, browser, ambiente ou infraestrutura pode exigir decisões diferentes mesmo quando o resultado técnico do gate é o mesmo.
+
+### Quality Gate PASSED
+
+Um resultado `PASSED` indica que os critérios automatizados definidos foram atendidos.
+
+Isso não significa, isoladamente, que não exista risco residual ou que a versão esteja automaticamente aprovada para liberação.
+
+Devem ser considerados também:
+
+- cobertura executada;
+- cenários não automatizados;
+- testes não executados;
+- defeitos conhecidos;
+- resultados exploratórios;
+- riscos residuais;
+- contexto e impacto para o negócio.
+
+### Responsabilidade pela Decisão
+
+O QA/QE deve consolidar evidências, comunicar riscos e fornecer uma recomendação técnica.
+
+A qualidade permanece responsabilidade compartilhada pelo time.
+
+Quando houver risco residual relevante, sua aceitação deve ser explícita pelos responsáveis pela decisão de entrega, de acordo com a governança adotada pelo time ou organização.
+
+O Quality Gate apoia a decisão; ele não substitui a análise de risco nem a responsabilidade de quem decide pela liberação.
+
+---
+
+## 10. Critérios de Go / No-Go
 
 ### Go
 
@@ -250,7 +306,7 @@ A decisão final deve ser baseada em evidências e risco de negócio, e não som
 
 ---
 
-## 10. Tratamento de Riscos Residuais
+## 11. Tratamento de Riscos Residuais
 
 Testes que não puderem ser executados dentro das 34 horas devem ser explicitamente registrados.
 
@@ -267,7 +323,7 @@ Essas informações devem ser comunicadas antes da decisão de liberação.
 
 ---
 
-## 11. Comunicação
+## 12. Comunicação
 
 Durante a execução serão comunicados:
 
@@ -284,7 +340,7 @@ Problemas críticos devem ser informados imediatamente, sem aguardar o encerrame
 
 ---
 
-## 12. Conclusão
+## 13. Conclusão
 
 Diante da redução de 48 para 34 horas, a estratégia proposta utiliza priorização baseada em risco, paralelização, automação, smoke test e regressão direcionada.
 
