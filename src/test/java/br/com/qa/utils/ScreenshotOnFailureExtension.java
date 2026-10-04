@@ -4,13 +4,15 @@ import br.com.qa.config.DriverFactory;
 import br.com.qa.failure.FailureClassification;
 import br.com.qa.failure.FailureClassifier;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScreenshotOnFailureExtension
-        implements TestExecutionExceptionHandler {
+        implements TestExecutionExceptionHandler,
+        LifecycleMethodExecutionExceptionHandler {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(
@@ -19,6 +21,29 @@ public class ScreenshotOnFailureExtension
 
     @Override
     public void handleTestExecutionException(
+            ExtensionContext context,
+            Throwable throwable
+    ) throws Throwable {
+        handleFailure(context, throwable);
+    }
+
+    @Override
+    public void handleBeforeEachMethodExecutionException(
+            ExtensionContext context,
+            Throwable throwable
+    ) throws Throwable {
+        handleFailure(context, throwable);
+    }
+
+    @Override
+    public void handleAfterEachMethodExecutionException(
+            ExtensionContext context,
+            Throwable throwable
+    ) throws Throwable {
+        handleFailure(context, throwable);
+    }
+
+    private void handleFailure(
             ExtensionContext context,
             Throwable throwable
     ) throws Throwable {
@@ -39,6 +64,13 @@ public class ScreenshotOnFailureExtension
                 throwable.getMessage()
         );
 
+        captureScreenshot(testName);
+
+        throw throwable;
+    }
+
+    private void captureScreenshot(String testName) {
+
         try {
             WebDriver driver = DriverFactory.getDriver();
 
@@ -56,7 +88,5 @@ public class ScreenshotOnFailureExtension
                     exception
             );
         }
-
-        throw throwable;
     }
 }
