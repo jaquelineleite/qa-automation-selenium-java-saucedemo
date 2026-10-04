@@ -2,11 +2,40 @@
 
 [![Automated Tests](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml/badge.svg)](https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo/actions/workflows/automated-tests.yml)
 
-Projeto de automação de testes Web desenvolvido com **Java, Selenium WebDriver, JUnit 5 e Maven**, utilizando **Page Object Pattern** e práticas voltadas à manutenção, isolamento, investigação de falhas e execução contínua.
+Projeto de Quality Engineering voltado à automação Web com **Java, Selenium WebDriver, JUnit 5 e Maven**.
 
-A suíte automatiza fluxos críticos de uma aplicação de e-commerce, contemplando cenários principais, alternativos e de exceção.
+O projeto utiliza o SauceDemo como aplicação de referência para demonstrar não apenas execução automatizada de testes, mas também decisões relacionadas a **arquitetura, risco, CI/CD, observabilidade, investigação de falhas, métricas e governança de qualidade**.
 
-Atualmente o projeto possui **12 testes automatizados**, execução cross-browser em **Google Chrome, Mozilla Firefox e Microsoft Edge**, modo headless, paralelismo controlado, captura automática de evidências em falhas, relatório HTML e pipeline de CI/CD.
+A suíte possui **12 execuções de testes de produto**, organizadas entre smoke e regressão, com suporte a **Google Chrome, Mozilla Firefox e Microsoft Edge**.
+
+---
+
+## O que este projeto demonstra
+
+O objetivo do projeto é aplicar práticas de engenharia de qualidade em uma suíte Web de tamanho controlado.
+
+Entre os principais conceitos demonstrados estão:
+
+- arquitetura de automação com separação de responsabilidades;
+- gerenciamento centralizado do WebDriver;
+- configuração centralizada;
+- isolamento do WebDriver por thread;
+- execução paralela controlada;
+- estratégia de testes baseada em risco;
+- separação entre smoke e regressão;
+- execução cross-browser;
+- CI/CD com estratégia diferente para Pull Request e branch principal;
+- dados de teste centralizados;
+- logging estruturado;
+- captura automática de evidências;
+- classificação estruturada de falhas;
+- observabilidade de falhas no ciclo de vida dos testes;
+- métricas da execução;
+- Quality Gate baseado em política;
+- gestão de comportamento intermitente;
+- critérios de entrada e saída;
+- análise de risco residual;
+- apoio técnico à decisão de Go/No-Go.
 
 ---
 
@@ -16,15 +45,44 @@ Atualmente o projeto possui **12 testes automatizados**, execução cross-browse
 - Selenium WebDriver 4.50.0
 - JUnit 5
 - Maven
+- Maven Surefire
+- SLF4J
+- Logback
 - Google Chrome
 - Mozilla Firefox
 - Microsoft Edge
 - Selenium Manager
-- Page Object Pattern
-- ThreadLocal WebDriver
-- Maven Surefire
-- Git e GitHub
+- Git
+- GitHub
 - GitHub Actions
+
+---
+
+## Estratégia de Qualidade
+
+A estratégia procura equilibrar velocidade de feedback, cobertura e risco.
+
+Os testes de produto recebem a tag `regression`.
+
+Os cenários considerados críticos também recebem a tag `smoke`.
+
+### Smoke
+
+O smoke contém os principais fluxos necessários para fornecer feedback rápido sobre comportamentos críticos:
+
+- login válido;
+- adição de produto ao carrinho;
+- conclusão da compra.
+
+Atualmente o smoke corresponde a **3 execuções**.
+
+### Regression
+
+A regressão contempla todos os cenários automatizados de produto.
+
+Atualmente corresponde a **12 execuções**.
+
+A separação permite aplicar estratégias diferentes no pipeline sem executar indiscriminadamente toda a matriz de regressão a cada alteração.
 
 ---
 
@@ -32,166 +90,84 @@ Atualmente o projeto possui **12 testes automatizados**, execução cross-browse
 
 ### Autenticação
 
-- Login com credenciais válidas
-- Login sem usuário
-- Login sem senha
-- Login com credenciais inválidas
-- Login com usuário bloqueado
+- login com credenciais válidas;
+- login sem usuário;
+- login sem senha;
+- login com credenciais inválidas;
+- login com usuário bloqueado.
 
 ### Carrinho
 
-- Adicionar produto ao carrinho
-- Validar produto adicionado
-- Validar contador do carrinho
-- Remover produto
-- Continuar comprando a partir do carrinho
+- adicionar produto;
+- validar produto adicionado;
+- validar contador;
+- remover produto;
+- continuar comprando.
 
 ### Checkout
 
-- Realizar compra completa
-- Validar produto no resumo
-- Finalizar compra
-- Validar confirmação da compra
-- Impedir checkout sem nome
-- Impedir checkout sem sobrenome
-- Impedir checkout sem CEP
+- realizar compra completa;
+- validar produto no resumo;
+- finalizar compra;
+- validar confirmação;
+- impedir checkout sem nome;
+- impedir checkout sem sobrenome;
+- impedir checkout sem CEP.
 
 ---
 
-## Resultado Atual
+## Arquitetura
 
-A mesma suíte de **12 testes automatizados** é executada nos três navegadores suportados:
-
-- Google Chrome
-- Mozilla Firefox
-- Microsoft Edge
-
-A matriz cross-browser foi validada no pipeline de Pull Request e novamente na branch `main`, com os três jobs concluídos com sucesso.
-
-Resultado esperado por navegador:
+A automação separa responsabilidades entre configuração, dados, páginas, testes, observabilidade e avaliação dos sinais de qualidade.
 
 ```text
-Tests run: 12
-Failures: 0
-Errors: 0
-Skipped: 0
-
-BUILD SUCCESS
-```
-
----
-
-## Estratégia de Testes
-
-A automação contempla três grupos principais.
-
-### Fluxo principal
-
-Login → Produtos → Carrinho → Checkout → Dados do cliente → Resumo → Finalização → Confirmação
-
-### Fluxos alternativos
-
-- remoção de produto;
-- retorno do carrinho para continuar comprando.
-
-### Fluxos de exceção
-
-- credenciais inválidas;
-- usuário bloqueado;
-- campos obrigatórios de login;
-- campos obrigatórios do checkout.
-
----
-
-## Estrutura do Projeto
-
-```text
-src/test/java/br/com/qa/
-├── config/
-│   └── DriverFactory.java
-├── pages/
-│   ├── BasePage.java
-│   ├── LoginPage.java
-│   ├── InventoryPage.java
-│   ├── CartPage.java
-│   ├── CheckoutPage.java
-│   ├── CheckoutOverviewPage.java
-│   └── CheckoutCompletePage.java
-├── tests/
-│   ├── BaseTest.java
-│   ├── LoginTest.java
-│   ├── CartTest.java
-│   ├── PurchaseTest.java
-│   ├── CheckoutValidationTest.java
-│   └── AlternativeFlowTest.java
-└── utils/
-    ├── ScreenshotUtils.java
-    └── ScreenshotOnFailureExtension.java
-
-src/test/resources/
-└── junit-platform.properties
-```
-
----
-
-## Arquitetura da Automação
-
-O projeto separa responsabilidades para facilitar manutenção, evolução e investigação de falhas.
-
-```text
-Testes / Assertions
-        ↓
+Test Strategy
+     |
+Smoke / Regression
+     |
+Product Tests
+     |
 Page Objects
-        ↓
+     |
 BasePage
-        ↓
+     |
 Selenium WebDriver
-        ↓
+     |
 DriverFactory
+     |
+TestConfig / TestData
 ```
 
 ### DriverFactory
 
-Centraliza a criação e o encerramento do WebDriver.
-
-A implementação utiliza `ThreadLocal<WebDriver>` para manter uma instância de navegador associada a cada thread de execução e remove essa referência durante o encerramento do driver.
-
-A `DriverFactory` oferece suporte a **Google Chrome, Mozilla Firefox e Microsoft Edge**, mantendo centralizada a criação e o ciclo de vida dos diferentes WebDrivers.
-
+Centraliza a criação, acesso e encerramento do WebDriver.
+Utiliza ThreadLocal<WebDriver> para manter a referência do navegador associada à thread de execução.
+Oferece suporte a Chrome, Firefox e Edge.
+### TestConfig
+Centraliza configurações da execução:
+- URL base;
+- navegador;
+- modo headless;
+- timeout de carregamento.
+As configurações podem ser alteradas por propriedades da execução sem espalhar valores pelo código.
+### TestData
+Centraliza dados reutilizáveis e reduz duplicação entre cenários.
+Dados específicos de determinado cenário podem permanecer próximos ao teste quando isso melhora sua legibilidade.
 ### BaseTest
-
-Centraliza o ciclo de vida dos testes, incluindo preparação da execução, acesso ao WebDriver e encerramento do navegador.
-
+Centraliza o ciclo de vida comum dos testes Web:
+- inicialização do navegador;
+- navegação inicial;
+- acesso ao WebDriver;
+- encerramento da sessão.
 ### BasePage
-
-Concentra comportamentos reutilizáveis do Selenium, incluindo:
-
-- esperas explícitas;
-- espera por elementos visíveis e clicáveis;
-- espera por alteração de URL;
-- ações reutilizáveis de clique e preenchimento;
-- fallback de clique via JavaScript quando a navegação esperada não ocorre;
-- validação reutilizável de carregamento das páginas.
-
-Timeouts esperados durante verificações de estado são tratados de forma específica, evitando transformar indiscriminadamente erros técnicos inesperados em um simples resultado `false`.
-
+Concentra comportamentos reutilizáveis do Selenium, incluindo esperas explícitas, interações e validações de carregamento.
 ### Page Objects
+Encapsulam seletores e comportamentos das páginas.
+As assertions permanecem nos testes, separando interação com a interface da validação do comportamento esperado.
 
-Encapsulam seletores e comportamentos específicos das páginas.
-
-As validações de carregamento reutilizam a estratégia centralizada da `BasePage`, reduzindo duplicação e mantendo um comportamento consistente entre as páginas.
-
-### Testes
-
-Os testes representam os cenários automatizados e mantêm as validações relacionadas ao comportamento esperado da aplicação.
-
----
-
-## Execução Paralela Controlada
+## Paralelismo e Isolamento
 
 O projeto utiliza paralelismo controlado através do JUnit 5.
-
-Configuração atual:
 
 ```properties
 junit.jupiter.execution.parallel.enabled=true
@@ -201,195 +177,286 @@ junit.jupiter.execution.parallel.config.strategy=fixed
 junit.jupiter.execution.parallel.config.fixed.parallelism=2
 ```
 
-Com essa estratégia:
+Classes diferentes podem executar concorrentemente, enquanto métodos da mesma classe permanecem sequenciais.
+O ThreadLocal<WebDriver> evita compartilhar a mesma referência de WebDriver entre threads.
+O paralelismo é tratado como decisão de engenharia e não como solução automática para reduzir o tempo do pipeline. Antes de aumentá-lo, devem ser considerados isolamento, dados, dependências e estabilidade da suíte.
+## Observabilidade
+Uma falha automatizada precisa fornecer informação suficiente para investigação.
+### Structured Logging
+SLF4J e Logback registram eventos relevantes da execução, incluindo:
+- início e término dos testes;
+- criação e encerramento do WebDriver;
+- falhas;
+- captura de screenshots;
+- métricas;
+- resultado do Quality Gate.
+### Screenshots
+Falhas geram tentativa automática de captura de screenshot.
+A geração da evidência é tratada de forma a não substituir a exceção original caso a própria captura apresente problema.
+### Lifecycle Failure Observability
+A extensão de falhas observa não apenas exceções originadas no corpo do teste, mas também falhas relacionadas ao ciclo de vida JUnit, incluindo BeforeEach e AfterEach.
+Isso permite preservar contexto quando uma execução falha durante preparação ou encerramento.
 
-- classes de teste diferentes podem executar concorrentemente;
-- métodos pertencentes à mesma classe permanecem sequenciais;
-- o paralelismo é limitado a duas threads;
-- cada thread mantém sua própria referência de WebDriver através de `ThreadLocal`.
+## Classificação de Falhas
 
-Essa configuração foi adotada de forma controlada, preservando a previsibilidade da suíte e permitindo avaliar o comportamento da automação sob concorrência.
+O projeto possui classificação estruturada para apoiar a investigação de falhas.
+
+Categorias atuais:
+
+```text
+SETUP_OR_INFRASTRUCTURE
+ASSERTION
+BROWSER_INTERACTION
+TEARDOWN
+UNKNOWN
+```
+
+A classificação fornece contexto inicial para análise.
+Ela não representa automaticamente a causa raiz e também não determina, isoladamente, se existe defeito no produto ou teste flaky.
+A investigação deve considerar stack trace, logs, evidências, etapa da execução, recorrência e reprodutibilidade.
+## Métricas de Qualidade
+As execuções de produto geram métricas como:
+- total executado;
+- aprovados;
+- falhos;
+- pass rate;
+- total crítico;
+- críticos aprovados;
+- críticos falhos;
+- critical pass rate;
+- duração da execução.
+A tag regression identifica os testes considerados nas métricas de produto.
+A tag smoke identifica os cenários críticos.
+Testes internos das regras do framework não são utilizados para compor as métricas de produto.
+As métricas representam sinais da execução automatizada e não devem ser interpretadas isoladamente como percentual absoluto de qualidade do produto.
+## Quality Gate
+O projeto possui uma política explícita de Quality Gate.
+Política atual deste laboratório:
+Overall pass rate >= 95%
+Critical pass rate = 100%
+Critical failures = 0
+
+Esses valores representam uma decisão deste projeto e não um padrão universal.
+O resultado da avaliação é registrado como:
+QUALITY GATE status=PASSED
+
+ou:
+QUALITY GATE status=FAILED
+
+O Quality Gate funciona como sinal técnico para apoiar a avaliação de risco.
+Ele não identifica automaticamente a causa de uma falha e não substitui análise de contexto, cobertura, defeitos conhecidos, testes não executados ou riscos residuais.
+A falha dos testes continua sendo tratada pelo Maven/Surefire no pipeline. O Quality Gate implementado no projeto registra a avaliação da política de qualidade e não deve ser confundido com o mecanismo que, isoladamente, bloqueia o pipeline.
+
+## CI/CD Baseada em Risco
+
+O workflow é executado em:
+
+- Pull Requests para `main`;
+- push para `main`;
+- execução manual.
+
+### Pull Request
+
+Para fornecer feedback rápido sem abandonar cobertura cross-browser, são executados:
+
+```text
+smoke      - Chrome
+smoke      - Firefox
+smoke      - Edge
+regression - Chrome
+```
+
+A estratégia utiliza fail-fast: false, permitindo observar o resultado dos demais jobs mesmo quando um deles falha.
+### Main / Execução Manual
+Na branch principal e em execução manual é realizada a regressão cross-browser:
+regression - Chrome
+regression - Firefox
+regression - Edge
+
+Os relatórios Surefire são preservados como artifacts.
+Screenshots são armazenados quando houver falha e evidências disponíveis.
+## Gestão de Instabilidade
+O projeto diferencia conceitos que frequentemente são tratados como equivalentes.
+Uma falha intermitente não é automaticamente:
+- defeito do produto;
+- teste flaky;
+- problema de infraestrutura.
+Da mesma forma, uma execução que falha e passa posteriormente no mesmo commit representa evidência de comportamento intermitente, mas não determina sozinha sua causa.
+A investigação considera:
+- logs;
+- stack trace;
+- screenshots;
+- etapa da falha;
+- classificação;
+- navegador;
+- ambiente;
+- recorrência;
+- reprodutibilidade.
+### Retry
+Retry não é utilizado como correção genérica para instabilidade.
+Aplicá-lo indiscriminadamente pode esconder problemas de sincronização, dados, dependências ou ambiente.
+### Quarentena
+Quarentena deve ser uma medida controlada e temporária, com evidência, responsável, impacto conhecido e critério de saída.
+
+## Governança da Qualidade
+
+Os sinais produzidos pela automação apoiam decisões de engenharia, mas não substituem julgamento técnico.
+
+Uma decisão de Go/No-Go deve considerar, entre outros fatores:
+
+- resultado da automação;
+- criticidade das falhas;
+- cobertura executada;
+- cenários não executados;
+- defeitos conhecidos;
+- resultados exploratórios;
+- riscos residuais;
+- contexto de negócio.
+
+Um Quality Gate aprovado não significa automaticamente ausência de risco.
+
+Um Quality Gate reprovado também não determina sozinho a causa ou a decisão final de release.
+
+O papel de QA/QE inclui consolidar evidências, tornar riscos visíveis e fornecer recomendação técnica.
+
+A responsabilidade pela qualidade é compartilhada pelo time.
 
 ---
 
-## Execução dos Testes
+## Estrutura do Projeto
+
+```text
+src/test/java/br/com/qa/
+├── config/
+│   ├── DriverFactory.java
+│   └── TestConfig.java
+├── data/
+│   ├── CheckoutData.java
+│   ├── TestData.java
+│   └── UserCredentials.java
+├── failure/
+│   ├── FailureCategory.java
+│   ├── FailureClassification.java
+│   ├── FailureClassifier.java
+│   └── FailureClassifierTest.java
+├── metrics/
+│   └── QualityMetricsExtension.java
+├── pages/
+│   ├── BasePage.java
+│   ├── CartPage.java
+│   ├── CheckoutCompletePage.java
+│   ├── CheckoutOverviewPage.java
+│   ├── CheckoutPage.java
+│   ├── InventoryPage.java
+│   └── LoginPage.java
+├── quality/
+│   ├── QualityGateEvaluator.java
+│   ├── QualityGateEvaluatorTest.java
+│   ├── QualityGatePolicy.java
+│   ├── QualityGateResult.java
+│   └── QualityMetrics.java
+├── tests/
+│   ├── AlternativeFlowTest.java
+│   ├── BaseTest.java
+│   ├── CartTest.java
+│   ├── CheckoutValidationTest.java
+│   ├── LoginTest.java
+│   └── PurchaseTest.java
+└── utils/
+    ├── ScreenshotOnFailureExtension.java
+    └── ScreenshotUtils.java
+
+src/test/resources/
+├── META-INF/services/org.junit.jupiter.api.extension.Extension
+├── junit-platform.properties
+└── logback-test.xml
+```
+
+---
+
+## Execução
 
 ### Pré-requisitos
 
-- Java 17 ou superior
-- Maven
-- Google Chrome, Mozilla Firefox ou Microsoft Edge para execução local no navegador correspondente
+- Java 17 ou superior;
+- Maven;
+- navegador correspondente para execução local.
 
 Clone o projeto:
 
 ```bash
 git clone https://github.com/jaquelineleite/qa-automation-selenium-java-saucedemo.git
-```
-
-Entre na pasta:
-
-```bash
 cd qa-automation-selenium-java-saucedemo
 ```
 
-Execute toda a suíte:
+### Regression - Chrome
+mvn clean verify -Dgroups=regression -Dbrowser=chrome
 
-```bash
-mvn clean test
-```
+### Smoke - Chrome
+mvn clean verify -Dgroups=smoke -Dbrowser=chrome
 
----
+### Regression - Firefox
+mvn clean verify -Dgroups=regression -Dbrowser=firefox
 
-## Relatório HTML
+### Regression - Edge
+mvn clean verify -Dgroups=regression -Dbrowser=edge
 
-Para executar os testes e gerar o relatório:
+### Execução com navegador visível
+mvn clean verify -Dgroups=regression -Dbrowser=chrome -Dheadless=false
 
-```bash
-mvn clean verify
-```
-
-O relatório será gerado em:
-
-```text
+## Evidências e Relatórios
+O relatório HTML é gerado em:
 target/reports/surefire.html
-```
 
----
+Os relatórios nativos do Surefire ficam em:
+target/surefire-reports/
 
-## Screenshots em Falhas
-
-Quando um teste falha, o framework captura automaticamente uma evidência antes do encerramento do navegador.
-
-Os screenshots são armazenados em:
-
-```text
+Screenshots de falhas são armazenados em:
 screenshots/
-```
 
-O nome da evidência contém informações que auxiliam na identificação da execução:
-
-```text
-teste-thread-id-timestamp.png
-```
-
-A identificação da thread e o timestamp com milissegundos ajudam a diferenciar evidências geradas em execuções concorrentes.
-
-A captura de evidência foi validada também através de falha controlada, verificando a geração do screenshot sem ocultar a falha original do teste.
-
----
-
-## Execução Headless
-
-Por padrão, os testes são executados em modo headless, adequado para GitHub Codespaces e pipelines CI/CD.
-
-```bash
-mvn clean test
-```
-
-Em uma máquina local com ambiente gráfico disponível, também é possível executar exibindo o navegador:
-
-```bash
-mvn clean test -Dheadless=false
-```
-
-> Em ambientes sem interface gráfica, como GitHub Codespaces, utilize o modo headless.
-
----
-
-## Configurações
-
-A URL pode ser alterada através da propriedade:
-
-```bash
--DbaseUrl=https://www.saucedemo.com/
-```
-
-Exemplo:
-
-```bash
-mvn clean test -DbaseUrl=https://www.saucedemo.com/
-```
-
-O navegador pode ser informado através da propriedade `browser`.
-
-```text
--Dbrowser=chrome
--Dbrowser=firefox
--Dbrowser=edge
-```
-
-A implementação oferece suporte a **Chrome, Firefox e Edge**, utilizando a mesma suíte automatizada.
-
----
-
+No GitHub Actions, relatórios e evidências aplicáveis são preservados como artifacts da execução.
 ## Documentação de QA
-
-Além da automação, o projeto possui documentação relacionada à estratégia de qualidade:
-
+O projeto possui documentação complementar sobre estratégia e governança de qualidade:
 - [Conceitos de Testes e Qualidade](docs/01-conceitos-de-testes.md)
 - [Plano de Testes](docs/02-plano-de-testes.md)
 - [Estratégia de Testes](docs/03-estrategia-de-testes.md)
 - [Gerenciamento de Incidentes](docs/04-gerenciamento-de-incidentes.md)
+- [Gestão de Instabilidade da Automação](docs/05-gestao-de-instabilidade-da-automacao.md)
+## Decisões e Limitações
+O escopo deste laboratório é deliberadamente focado em automação Web.
+### Quality Gate
+O Quality Gate fornece um sinal técnico da execução. Ele não realiza, isoladamente, a decisão de release.
+### Failure Classification
+A classificação de falhas auxilia a investigação e a análise de causa, mas uma categoria não representa automaticamente a causa raiz.
+### Instabilidade
+Comportamento intermitente exige evidências, recorrência e investigação.
+Uma falha seguida de sucesso em nova execução do mesmo commit é evidência de intermitência, mas não é suficiente para determinar automaticamente a causa ou classificar um teste como flaky.
+### Retry
+Retry não foi adotado como solução genérica para falhas intermitentes.
+### Histórico de Métricas
+As métricas representam a execução corrente.
+O projeto não implementa persistência ou análise histórica de tendências. Essa capacidade exigiria uma estratégia própria de armazenamento, identificação e agregação dos resultados entre execuções.
+### Escopo
+Testes de API, mobile e performance não fazem parte deste laboratório Web.
+Essas capacidades podem ser demonstradas em projetos específicos ao respectivo contexto, evitando adicionar complexidade sem necessidade.
+## Princípios Aplicados
+Falhou?
+   |
+Preservar evidência
+   |
+Classificar o sinal
+   |
+Investigar
+   |
+Buscar causa
+   |
+Avaliar recorrência e risco
+   |
+Corrigir / mitigar / aceitar risco
+   |
+Validar novamente
 
----
-
-## Boas Práticas Aplicadas
-
-- Page Object Pattern
-- separação de responsabilidades
-- esperas explícitas
-- ausência de `Thread.sleep()`
-- centralização de comportamentos reutilizáveis
-- centralização do ciclo de vida do WebDriver
-- isolamento do WebDriver por thread
-- paralelismo controlado
-- testes independentes
-- validação centralizada de carregamento das páginas
-- tratamento específico de timeout nas verificações de estado
-- execução headless
-- screenshots automáticos em falhas
-- identificação das evidências por teste, thread e timestamp
-- relatório HTML
-- priorização de cenários por risco
-- CI/CD como mecanismo de feedback e validação automatizada
-
----
-
-## Integração Contínua
-
-O projeto possui pipeline configurado com **GitHub Actions**, executado automaticamente em `push` e `pull_request` para a branch `main`.
-
-O workflow utiliza uma **matriz cross-browser** para executar a mesma suíte em **Google Chrome, Mozilla Firefox e Microsoft Edge**.
-
-Para cada navegador, o pipeline realiza:
-
-- checkout do repositório;
-- configuração do Java 17;
-- execução da suíte com `mvn clean verify -Dbrowser=<browser>`;
-- geração e armazenamento do relatório de testes em artifact específico por navegador (`test-report-<browser>`);
-- armazenamento de screenshots em artifact específico por navegador (`failure-screenshots-<browser>`) quando houver falhas.
-
-A estratégia utiliza `fail-fast: false`, permitindo que os jobs dos demais navegadores continuem mesmo se um deles apresentar falha.
-
-Essa execução fornece validação automatizada cross-browser e feedback contínuo sobre as alterações enviadas ao repositório.
-
-O status da execução pode ser acompanhado pelo badge disponível no início deste README.
-
----
-
-## Próximas Evoluções
-
-- ampliação da cobertura com testes de API;
-- inclusão de testes de performance;
-- publicação navegável do relatório de testes;
-- evolução da estratégia de dados para cenários com maior concorrência.
-
----
-
+O objetivo não é apenas fazer testes passarem, mas produzir feedback confiável para apoiar decisões de engenharia.
 ## Autor
-
-**Jaqueline Fernandes de Andrade**
-
-QA | Quality Assurance | Test Automation
-
-GitHub: [jaquelineleite](https://github.com/jaquelineleite)
+Jaqueline Fernandes de Andrade
+QA | Quality Engineering | Test Automation
