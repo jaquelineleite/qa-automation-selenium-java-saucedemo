@@ -245,7 +245,11 @@ QUALITY GATE status=FAILED
 
 O Quality Gate funciona como sinal técnico para apoiar a avaliação de risco.
 Ele não identifica automaticamente a causa de uma falha e não substitui análise de contexto, cobertura, defeitos conhecidos, testes não executados ou riscos residuais.
-A falha dos testes continua sendo tratada pelo Maven/Surefire no pipeline. O Quality Gate implementado no projeto registra a avaliação da política de qualidade e não deve ser confundido com o mecanismo que, isoladamente, bloqueia o pipeline.
+
+Por padrão, a avaliação da política é informativa em execuções locais.
+Quando `-Dquality.gate.enforce=true` é utilizado, uma reprovação da política gera falha na execução.
+
+No CI, o enforcement é habilitado explicitamente nos jobs automatizados. Dessa forma, além das falhas dos testes tratadas pelo Maven/Surefire, a violação da política do Quality Gate também pode bloquear o pipeline.
 
 ## CI/CD Baseada em Risco
 

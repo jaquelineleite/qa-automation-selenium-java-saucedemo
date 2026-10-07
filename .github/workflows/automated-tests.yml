@@ -44,6 +44,7 @@ jobs:
           mvn clean verify
           -Dgroups=${{ matrix.suite }}
           -Dbrowser=${{ matrix.browser }}
+          -Dquality.gate.enforce=true
 
       - name: Upload test report
         if: always()
@@ -88,7 +89,7 @@ jobs:
           cache: maven
 
       - name: Execute regression tests - ${{ matrix.browser }}
-        run: mvn clean verify -Dgroups=regression -Dbrowser=${{ matrix.browser }}
+        run: mvn clean verify -Dgroups=regression -Dbrowser=${{ matrix.browser }} -Dquality.gate.enforce=true
 
       - name: Upload test report
         if: always()

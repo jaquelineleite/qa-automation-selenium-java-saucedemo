@@ -1,5 +1,6 @@
 package br.com.qa.metrics;
 
+import br.com.qa.quality.QualityGateEnforcer;
 import br.com.qa.quality.QualityGateEvaluator;
 import br.com.qa.quality.QualityGatePolicy;
 import br.com.qa.quality.QualityGateResult;
@@ -22,6 +23,9 @@ public class QualityMetricsExtension
 
     private static final String PRODUCT_TEST_TAG = "regression";
     private static final String CRITICAL_TAG = "smoke";
+
+    private static final String QUALITY_GATE_ENFORCE_PROPERTY =
+            "quality.gate.enforce";
 
     private static final ExtensionContext.Namespace NAMESPACE =
             ExtensionContext.Namespace.create(
@@ -216,7 +220,21 @@ public class QualityMetricsExtension
                         "QUALITY GATE status=FAILED reasons={}",
                         result.reasons()
                 );
+
+                QualityGateEnforcer.enforce(
+                        result,
+                        isQualityGateEnforced()
+                );
             }
+        }
+
+        private static boolean isQualityGateEnforced() {
+            return Boolean.parseBoolean(
+                    System.getProperty(
+                            QUALITY_GATE_ENFORCE_PROPERTY,
+                            "false"
+                    )
+            );
         }
 
         private static double calculateRate(
