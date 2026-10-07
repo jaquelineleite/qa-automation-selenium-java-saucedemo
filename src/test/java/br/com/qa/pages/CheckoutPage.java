@@ -2,20 +2,11 @@ package br.com.qa.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.time.Duration;
 
 public class CheckoutPage extends BasePage {
-
-    private static final Duration SUBMIT_TIMEOUT =
-            Duration.ofSeconds(2);
-
-    private static final Duration VALIDATION_TIMEOUT =
-            Duration.ofSeconds(3);
 
     private final By firstNameInput =
             By.id("first-name");
@@ -48,35 +39,18 @@ public class CheckoutPage extends BasePage {
             By locator,
             String value
     ) {
+        WebElement element = waitForClickable(locator);
 
-        WebElement element =
-                waitForClickable(locator);
-
-        /*
-         * Primeiro utiliza a interação padrão do Selenium.
-         */
         element.click();
         element.clear();
         element.sendKeys(value);
 
-        /*
-         * Alguns inputs controlados pelo React podem manter
-         * estado interno diferente do valor apresentado no DOM.
-         *
-         * O setter nativo e os eventos input/change sincronizam
-         * o valor com o mecanismo de eventos da aplicação.
-         */
         synchronizeReactInput(
                 element,
                 value
         );
 
-        /*
-         * Relocaliza o elemento durante a espera em vez de
-         * depender da referência WebElement original.
-         */
         wait.until(currentDriver -> {
-
             WebElement currentElement =
                     currentDriver.findElement(locator);
 
@@ -90,6 +64,7 @@ public class CheckoutPage extends BasePage {
             return value.equals(currentValue);
         });
     }
+
 
     private void synchronizeReactInput(
             WebElement element,
@@ -178,25 +153,6 @@ public class CheckoutPage extends BasePage {
         fillPostalCode(postalCode);
     }
 
-    private boolean waitForCheckoutResult(
-            Duration duration
-    ) {
-
-        return waitForCondition(
-                currentDriver ->
-                        currentDriver
-                                .getCurrentUrl()
-                                .contains(
-                                        "checkout-step-two.html"
-                                )
-                                ||
-                        !currentDriver
-                                .findElements(errorMessage)
-                                .isEmpty(),
-                duration
-        );
-    }
-
     private void submitFormWithJavaScript() {
 
         WebElement button =
@@ -212,57 +168,11 @@ public class CheckoutPage extends BasePage {
     }
 
     public void continueCheckout() {
-
-        /*
-         * Estratégia principal:
-         * interação real pelo WebDriver.
-         */
-        click(continueButton);
-
-        /*
-         * Se a aplicação não responder no intervalo esperado,
-         * tenta submissão pelo teclado.
-         */
-        if (!waitForCheckoutResult(
-                SUBMIT_TIMEOUT)) {
-
-            WebElement button =
-                    waitForClickable(
-                            continueButton
-                    );
-
-            button.sendKeys(Keys.ENTER);
-        }
-
-        /*
-         * Último fallback:
-         * submissão explícita do formulário.
-         */
-        if (!waitForCheckoutResult(
-                SUBMIT_TIMEOUT)) {
-
-            submitFormWithJavaScript();
-        }
-
-        /*
-         * Aguarda o resultado definitivo utilizando
-         * o timeout padrão da BasePage.
-         */
-        boolean checkoutCompleted =
-                waitForCheckoutResult(
-                        Duration.ofSeconds(10)
-                );
-
-        if (!checkoutCompleted) {
-
-            throw new IllegalStateException(
-                    "Checkout não respondeu após o envio. URL atual: "
-                            + driver.getCurrentUrl()
-            );
-        }
-
+        submitFormWithJavaScript();
+        waitForUrlContaining("checkout-step-two.html");
         validateSuccessfulCheckout();
     }
+
 
     private void validateSuccessfulCheckout() {
 
@@ -292,27 +202,10 @@ public class CheckoutPage extends BasePage {
     }
 
     public void submitExpectingValidationError() {
-
-        click(continueButton);
-
-        boolean validationDisplayed =
-                waitForCondition(
-                        ExpectedConditions
-                                .visibilityOfElementLocated(
-                                        errorMessage
-                                ),
-                        VALIDATION_TIMEOUT
-                );
-
-        if (!validationDisplayed) {
-
-            submitFormWithJavaScript();
-
-            waitForVisibility(
-                    errorMessage
-            );
-        }
+        submitFormWithJavaScript();
+        waitForVisibility(errorMessage);
     }
+
 
     public String getErrorMessage() {
         return getText(errorMessage);
