@@ -19,9 +19,6 @@ public abstract class BasePage {
     private static final Duration DEFAULT_TIMEOUT =
             Duration.ofSeconds(10);
 
-    private static final Duration ACTION_TIMEOUT =
-            Duration.ofSeconds(3);
-
     protected BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(
@@ -105,22 +102,9 @@ public abstract class BasePage {
 
         click(locator);
 
-        boolean navigationCompleted =
-                waitForCondition(
-                        ExpectedConditions.urlContains(
-                                expectedUrlFragment
-                        ),
-                        ACTION_TIMEOUT
-                );
-
-        if (!navigationCompleted) {
-
-            clickWithJavaScript(locator);
-
-            waitForUrlContaining(
-                    expectedUrlFragment
-            );
-        }
+        waitForUrlContaining(
+                expectedUrlFragment
+        );
     }
 
     protected void type(By locator, String text) {

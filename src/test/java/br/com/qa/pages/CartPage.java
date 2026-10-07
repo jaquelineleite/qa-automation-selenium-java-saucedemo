@@ -47,16 +47,12 @@ public class CartPage extends BasePage {
     }
 
     public void proceedToCheckout() {
-        clickAndWaitForUrl(
-                checkoutButton,
-                "checkout-step-one.html"
-        );
+        clickWithJavaScript(checkoutButton);
+        waitForUrlContaining("checkout-step-one.html");
     }
 
     public void continueShopping() {
-        clickAndWaitForUrl(
-                continueShoppingButton,
-                "inventory.html"
-        );
+        clickWithJavaScript(continueShoppingButton);
+        waitForUrlContaining("inventory.html");
     }
 }

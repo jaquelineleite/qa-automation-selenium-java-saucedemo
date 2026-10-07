@@ -106,9 +106,7 @@ public class InventoryPage extends BasePage {
     }
 
     public void openCart() {
-        clickAndWaitForUrl(
-                shoppingCartLink,
-                "cart.html"
-        );
+        clickWithJavaScript(shoppingCartLink);
+        waitForUrlContaining("cart.html");
     }
 }

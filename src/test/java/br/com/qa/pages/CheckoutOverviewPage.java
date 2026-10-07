@@ -27,9 +27,7 @@ public class CheckoutOverviewPage extends BasePage {
     }
 
     public void finishPurchase() {
-        clickAndWaitForUrl(
-                finishButton,
-                "checkout-complete.html"
-        );
+        clickWithJavaScript(finishButton);
+        waitForUrlContaining("checkout-complete.html");
     }
 }
