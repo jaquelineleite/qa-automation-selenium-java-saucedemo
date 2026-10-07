@@ -72,6 +72,14 @@ public class ScreenshotOnFailureExtension
     private void captureScreenshot(String testName) {
 
         try {
+            if (!DriverFactory.hasDriver()) {
+                LOGGER.warn(
+                        "SCREENSHOT SKIPPED test={} reason=WebDriver not initialized",
+                        testName
+                );
+                return;
+            }
+
             WebDriver driver = DriverFactory.getDriver();
 
             ScreenshotUtils.takeScreenshot(

@@ -165,6 +165,10 @@ public final class DriverFactory {
         );
     }
 
+    public static boolean hasDriver() {
+        return DRIVER.get() != null;
+    }
+
     public static WebDriver getDriver() {
 
         WebDriver driver =
