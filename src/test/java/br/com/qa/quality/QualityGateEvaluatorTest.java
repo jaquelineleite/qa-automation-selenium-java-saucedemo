@@ -99,4 +99,25 @@ class QualityGateEvaluatorTest {
                                 reason.contains("Critical failures"))
         );
     }
+
+    @Test
+    void shouldNotFailCriticalPassRateWhenNoCriticalTestsWereExecuted() {
+
+        QualityMetrics metrics = new QualityMetrics(
+                3,
+                3,
+                0,
+                100.0,
+                0,
+                0,
+                0,
+                0.0
+        );
+
+        QualityGateResult result =
+                evaluator.evaluate(metrics, policy);
+
+        assertTrue(result.passed());
+        assertTrue(result.reasons().isEmpty());
+    }
 }

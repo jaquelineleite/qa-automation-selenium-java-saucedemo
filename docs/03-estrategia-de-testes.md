@@ -231,6 +231,15 @@ A política atual deste projeto considera:
 - taxa de aprovação dos testes críticos de 100%;
 - nenhuma falha crítica permitida.
 
+Quando uma execução filtrada não contém testes críticos, o critério de taxa
+de aprovação crítica não é avaliado nessa execução. A ausência de testes
+críticos não deve ser interpretada como taxa crítica de 0%.
+
+Essa condição não comprova a qualidade dos fluxos críticos; apenas indica que
+esse critério não fez parte da cobertura executada. A decisão de liberação
+deve considerar explicitamente a cobertura realizada e os testes não
+executados.
+
 Esses limites representam uma política definida para este projeto e não devem ser tratados como valores universais para qualquer produto ou contexto.
 
 ### Quality Gate FAILED

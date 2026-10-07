@@ -24,7 +24,8 @@ public class QualityGateEvaluator {
             ));
         }
 
-        if (metrics.criticalPassRate()
+        if (metrics.criticalTotal() > 0
+                && metrics.criticalPassRate()
                 < policy.minimumCriticalPassRate()) {
 
             reasons.add(String.format(
