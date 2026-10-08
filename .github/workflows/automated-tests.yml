@@ -94,6 +94,18 @@ jobs:
           java-version: '17'
           cache: maven
 
+      - name: Diagnose SauceDemo HTTP - Edge
+        if: matrix.browser == 'edge'
+        continue-on-error: true
+        run: |
+          echo "HTTP diagnostic: SauceDemo"
+          curl --silent --show-error \
+            --location \
+            --output /dev/null \
+            --max-time 20 \
+            --write-out 'http_code=%{http_code} dns=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s first_byte=%{time_starttransfer}s total=%{time_total}s\n' \
+            https://www.saucedemo.com/
+
       - name: Execute regression tests - ${{ matrix.browser }}
         env:
           SEQUENTIAL_EDGE: ${{ github.event_name == 'workflow_dispatch' && inputs.sequential_edge && matrix.browser == 'edge' }}
