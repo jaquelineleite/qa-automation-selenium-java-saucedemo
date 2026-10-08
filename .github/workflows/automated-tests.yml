@@ -8,6 +8,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      sequential_edge:
+        description: 'Executar Edge sequencialmente para diagnóstico'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   pull-request-tests:
@@ -89,7 +95,19 @@ jobs:
           cache: maven
 
       - name: Execute regression tests - ${{ matrix.browser }}
-        run: mvn clean verify -Dgroups=regression -Dbrowser=${{ matrix.browser }} -Dquality.gate.enforce=true
+        env:
+          SEQUENTIAL_EDGE: ${{ github.event_name == 'workflow_dispatch' && inputs.sequential_edge && matrix.browser == 'edge' }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "$SEQUENTIAL_EDGE" = "true" ]; then
+            EXTRA_ARGS="-Djunit.jupiter.execution.parallel.enabled=false"
+          fi
+
+          mvn clean verify \
+            -Dgroups=regression \
+            -Dbrowser=${{ matrix.browser }} \
+            -Dquality.gate.enforce=true \
+            $EXTRA_ARGS
 
       - name: Upload test report
         if: always()
