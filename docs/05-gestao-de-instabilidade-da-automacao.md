@@ -245,6 +245,40 @@ Como melhoria, a extensão de observabilidade passou a considerar falhas de `Bef
 
 ---
 
+### 10.1 Investigação com causa raiz comprovada — Firefox
+
+Em uma execução cross-browser no Firefox, os testes falharam durante o `BaseTest.setUp()` antes de alcançar os fluxos funcionais da aplicação.
+
+O sintoma observado foi uma `SessionNotCreatedException`, indicando que o processo do Firefox era encerrado durante a criação da sessão do WebDriver.
+
+A classificação da falha apontou `SETUP_OR_INFRASTRUCTURE`. Essa classificação foi utilizada como sinal para direcionar a investigação, e não como conclusão automática sobre a causa raiz.
+
+A investigação foi realizada de forma incremental:
+
+1. a falha foi observada na execução completa com Firefox;
+2. o mesmo cenário foi executado isoladamente e sem paralelismo;
+3. a falha continuou ocorrendo, reduzindo a hipótese de concorrência como causa;
+4. o ambiente de execução e os binários utilizados pelo Selenium foram inspecionados;
+5. o Firefox gerenciado pelo Selenium foi executado diretamente;
+6. a execução revelou ausência da biblioteca de sistema `libgtk-3.so.0`;
+7. a dependência GTK3 foi instalada no ambiente;
+8. o mesmo teste isolado foi executado novamente com sucesso;
+9. a suíte completa foi executada novamente no Firefox com sucesso.
+
+Após a correção do ambiente:
+
+- o teste isolado executou com `1` teste aprovado, sem falhas ou erros;
+- a execução completa apresentou `24` testes aprovados, sem falhas ou erros;
+- o paralelismo permaneceu limitado aos dois workers configurados;
+- nenhuma alteração funcional nos testes foi necessária para corrigir o problema;
+- retry não foi utilizado para mascarar a falha.
+
+Nesse incidente, `SessionNotCreatedException` representava o sintoma observado. A causa raiz comprovada foi a ausência da dependência de sistema necessária para inicialização do Firefox naquele ambiente de execução.
+
+O caso demonstra a importância de separar falha funcional, falha da automação e falha de infraestrutura. Também demonstra que a classificação automática auxilia a investigação, mas a causa raiz deve ser estabelecida a partir de evidências adicionais.
+
+---
+
 ## 11. Responsabilidade de Quality Engineering
 
 A gestão de instabilidade não consiste apenas em manter o pipeline verde.
