@@ -279,6 +279,83 @@ O caso demonstra a importância de separar falha funcional, falha da automação
 
 ---
 
+### 10.2 Investigação complementar — Edge no GitHub Actions
+
+#### Contexto
+
+Durante execuções de regressão no GitHub Actions, o Microsoft Edge
+apresentou falhas intermitentes na navegação inicial para o SauceDemo.
+
+A exceção observada foi `TimeoutException`, com a mensagem
+`Timed out receiving message from renderer: 30.000`.
+
+O erro ocorreu em `BaseTest.setUp()`, durante a chamada
+`driver.get(TestConfig.getBaseUrl())`, antes das validações funcionais.
+
+#### Evidências e experimentos
+
+1. Em execuções paralelas no GitHub Actions, foram observados
+   timeouts do renderer durante o setup.
+2. Outras execuções paralelas foram aprovadas, demonstrando
+   comportamento intermitente.
+3. Foi adicionado temporariamente um parâmetro ao workflow
+   para executar o Edge sequencialmente.
+4. Mesmo com execução sequencial, ocorreu timeout durante
+   a navegação inicial.
+5. Na execução sequencial com falha, 11 dos 12 testes passaram,
+   resultando em taxa de aprovação de 91,67%.
+6. Os três testes classificados como críticos passaram.
+7. O Quality Gate apresentou `FAILED`, pois a taxa geral
+   ficou abaixo do limite mínimo de 95%.
+8. Foi realizada uma verificação HTTP temporária no runner,
+   antes da regressão do Edge.
+9. Na execução #59, commit `8639f8c`, o SauceDemo respondeu
+   com HTTP 200 e tempo total aproximado de 59 ms.
+10. Nessa mesma execução, a regressão do Edge foi aprovada.
+11. Os diagnósticos temporários foram removidos no commit
+    `cee32fa`, preservando a configuração normal do pipeline.
+
+#### Análise das hipóteses
+
+| Hipótese | Resultado |
+|---|---|
+| Concorrência entre workers é necessária para a falha | Não sustentada: houve falha sequencial |
+| Defeito funcional nos cenários afetados | Não demonstrado: erro ocorreu no setup |
+| Indisponibilidade contínua do SauceDemo | Não sustentada pela sondagem HTTP bem-sucedida |
+| Instabilidade de navegação ou renderer do Edge no CI | Hipótese compatível, ainda sem causa raiz comprovada |
+| Problema de recursos ou ambiente do runner | Possível, não comprovado |
+
+A sondagem HTTP ocorreu antes dos testes. Portanto, seu sucesso
+não garante disponibilidade durante toda a regressão nem comprova
+que a renderização no navegador funcionaria corretamente.
+
+#### Decisão técnica
+
+Não foram adicionados retries automáticos, quarentena ou aumentos
+indiscriminados de timeout.
+
+O paralelismo original foi preservado, pois a execução sequencial
+também apresentou falha.
+
+O incidente permanece com causa raiz não determinada e deve ser
+acompanhado caso novas ocorrências sejam observadas.
+
+#### Conclusão
+
+As evidências demonstram intermitência durante a navegação inicial
+do Edge no ambiente de integração contínua.
+
+A classificação `SETUP_OR_INFRASTRUCTURE` identifica o contexto
+da falha, mas não determina sua causa raiz.
+
+O Quality Gate funcionou conforme a política definida, bloqueando
+a execução cuja taxa de aprovação ficou abaixo do limite.
+
+A investigação diferencia observação, hipótese, experimento e
+conclusão, sem apresentar uma correção não comprovada como definitiva.
+
+---
+
 ## 11. Responsabilidade de Quality Engineering
 
 A gestão de instabilidade não consiste apenas em manter o pipeline verde.
