@@ -175,6 +175,7 @@ junit.jupiter.execution.parallel.mode.default=same_thread
 junit.jupiter.execution.parallel.mode.classes.default=concurrent
 junit.jupiter.execution.parallel.config.strategy=fixed
 junit.jupiter.execution.parallel.config.fixed.parallelism=2
+junit.jupiter.execution.parallel.config.fixed.max-pool-size=2
 ```
 
 Classes diferentes podem executar concorrentemente, enquanto métodos da mesma classe permanecem sequenciais.
@@ -237,6 +238,8 @@ Critical pass rate = 100%
 Critical failures = 0
 
 Esses valores representam uma decisão deste projeto e não um padrão universal.
+
+Quando uma execução filtrada não contém testes críticos, o critério de taxa de aprovação crítica não é avaliado. A ausência de testes críticos não representa taxa crítica de 0% nem comprova a qualidade dos fluxos críticos; indica apenas que esse critério não fez parte da cobertura executada.
 O resultado da avaliação é registrado como:
 QUALITY GATE status=PASSED
 
