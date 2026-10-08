@@ -233,9 +233,11 @@ As métricas representam sinais da execução automatizada e não devem ser inte
 ## Quality Gate
 O projeto possui uma política explícita de Quality Gate.
 Política atual deste laboratório:
+```text
 Overall pass rate >= 95%
 Critical pass rate = 100%
 Critical failures = 0
+```
 
 Esses valores representam uma decisão deste projeto e não um padrão universal.
 
@@ -304,6 +306,8 @@ Retry não é utilizado como correção genérica para instabilidade.
 Aplicá-lo indiscriminadamente pode esconder problemas de sincronização, dados, dependências ou ambiente.
 ### Quarentena
 Quarentena deve ser uma medida controlada e temporária, com evidência, responsável, impacto conhecido e critério de saída.
+
+A investigação da instabilidade do Edge no GitHub Actions está documentada em [Gestão de Instabilidade da Automação](docs/05-gestao-de-instabilidade-da-automacao.md).
 
 ## Governança da Qualidade
 
@@ -397,19 +401,34 @@ cd qa-automation-selenium-java-saucedemo
 ```
 
 ### Regression - Chrome
+
+```bash
 mvn clean verify -Dgroups=regression -Dbrowser=chrome
+```
 
 ### Smoke - Chrome
+
+```bash
 mvn clean verify -Dgroups=smoke -Dbrowser=chrome
+```
 
 ### Regression - Firefox
+
+```bash
 mvn clean verify -Dgroups=regression -Dbrowser=firefox
+```
 
 ### Regression - Edge
+
+```bash
 mvn clean verify -Dgroups=regression -Dbrowser=edge
+```
 
 ### Execução com navegador visível
+
+```bash
 mvn clean verify -Dgroups=regression -Dbrowser=chrome -Dheadless=false
+```
 
 ## Evidências e Relatórios
 O relatório HTML é gerado em:
@@ -447,6 +466,8 @@ O projeto não implementa persistência ou análise histórica de tendências. E
 Testes de API, mobile e performance não fazem parte deste laboratório Web.
 Essas capacidades podem ser demonstradas em projetos específicos ao respectivo contexto, evitando adicionar complexidade sem necessidade.
 ## Princípios Aplicados
+
+```text
 Falhou?
    |
 Preservar evidência
@@ -462,6 +483,7 @@ Avaliar recorrência e risco
 Corrigir / mitigar / aceitar risco
    |
 Validar novamente
+```
 
 O objetivo não é apenas fazer testes passarem, mas produzir feedback confiável para apoiar decisões de engenharia.
 ## Autor
