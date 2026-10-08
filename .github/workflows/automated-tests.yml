@@ -8,12 +8,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      sequential_edge:
-        description: 'Executar Edge sequencialmente para diagnóstico'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   pull-request-tests:
@@ -94,32 +88,12 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Diagnose SauceDemo HTTP - Edge
-        if: matrix.browser == 'edge'
-        continue-on-error: true
-        run: |
-          echo "HTTP diagnostic: SauceDemo"
-          curl --silent --show-error \
-            --location \
-            --output /dev/null \
-            --max-time 20 \
-            --write-out 'http_code=%{http_code} dns=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s first_byte=%{time_starttransfer}s total=%{time_total}s\n' \
-            https://www.saucedemo.com/
-
       - name: Execute regression tests - ${{ matrix.browser }}
-        env:
-          SEQUENTIAL_EDGE: ${{ github.event_name == 'workflow_dispatch' && inputs.sequential_edge && matrix.browser == 'edge' }}
-        run: |
-          EXTRA_ARGS=""
-          if [ "$SEQUENTIAL_EDGE" = "true" ]; then
-            EXTRA_ARGS="-Djunit.jupiter.execution.parallel.enabled=false"
-          fi
-
-          mvn clean verify \
-            -Dgroups=regression \
-            -Dbrowser=${{ matrix.browser }} \
-            -Dquality.gate.enforce=true \
-            $EXTRA_ARGS
+        run: >
+          mvn clean verify
+          -Dgroups=regression
+          -Dbrowser=${{ matrix.browser }}
+          -Dquality.gate.enforce=true
 
       - name: Upload test report
         if: always()
